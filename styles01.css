@@ -1,0 +1,23 @@
+body {
+       background-color: black);
+   }
+
+   h1 {
+       background-color:lightseagreen;
+       color: black;
+       text-align: center;
+       border:3px solid Violet;
+   }
+  
+   h2 {
+      color: black;
+      background-color:lightblue;
+      text-align: center;
+      border:10px solid Violet;
+   }
+
+   p {
+        font-family: Verdana, Geneva, Tahoma, sans-serif;
+        font-size: 30px;
+        color: white;
+   }
