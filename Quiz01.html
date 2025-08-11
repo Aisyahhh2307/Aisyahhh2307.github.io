@@ -1,34 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>Simple Web Design</title>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
- <link rel="stylesheet" href="quiz01style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Web Layout</title>
+    <link rel="stylesheet" href="quiz01style.css">
 </head>
-
 <body>
 
-<header>
-  <h2>Header</h2>
-</header>
+    <div class="container">
+        <header>
+            <h1>Header</h1>
+        </header>
 
-<section>
-  <nav>
-    <ul>
-      <li><a href="#">...</li>
-    </ul>
-  </nav>
-  
-  <article>
-    <h1>Content</h1>
-    <p>...</p>
-  </article>
-</section>
+        <nav>
+            <h2>Menu Navigasi</h2>
+        </nav>
 
-<footer>
-  <p>Footer</p>
-</footer>
+        <main>
+            <aside class="sidebar-left">
+                <h3>Sidebar</h3>
+            </aside>
+
+            <section class="content">
+                <h3>Content</h3>
+            </section>
+
+            <aside class="sidebar-right">
+                <h3>Sidebar</h3>
+            </aside>
+        </main>
+
+        <footer>
+            <h3>Footer</h3>
+        </footer>
+    </div>
 
 </body>
 </html>

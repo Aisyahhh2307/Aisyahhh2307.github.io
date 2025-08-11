@@ -1,62 +1,51 @@
-* {
-  box-sizing: border-box;
-}
-
+/* Basic styling for the body and container */
 body {
-  font-family: Arial, Helvetica, sans-serif;
+    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #333;
+    color: white;
+    text-align: center;
 }
 
-/* Style the header */
-header {
-  background-color: #666;
-  padding: 30px;
-  text-align: center;
-  font-size: 35px;
-  color: white;
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 20px auto;
 }
 
-/* Create two columns/boxes that floats next to each other */
+/* Common styling for all sections */
+header, nav, main, footer, aside, section {
+    padding: 20px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    box-sizing: border-box; /* Ensures padding doesn't affect width */
+}
+
+/* Color and specific styling for each section */
+header, footer {
+    background-color: #d9534f; /* Red-like color */
+}
+
 nav {
-  float: left;
-  width: 30%;
-  height: 300px; /* only for demonstration, should be removed */
-  background: #ccc;
-  padding: 20px;
+    background-color: #f0ad4e; /* Orange-like color */
 }
 
-/* Style the list inside the menu */
-nav ul {
-  list-style-type: none;
-  padding: 0;
+.content {
+    background-color: #f0ad4e; /* Orange-like color */
+    flex-grow: 1; /* Allows it to take up available space */
+    margin: 0 10px;
 }
 
-article {
-  float: left;
-  padding: 20px;
-  width: 70%;
-  background-color: #f1f1f1;
-  height: 300px; /* only for demonstration, should be removed */
+.sidebar-left, .sidebar-right {
+    background-color: #d9534f; /* Red-like color */
+    width: 250px; /* Fixed width for sidebars */
 }
 
-/* Clear floats after the columns */
-section::after {
-  content: "";
-  display: table;
-  clear: both;
-}
-
-/* Style the footer */
-footer {
-  background-color: #777;
-  padding: 10px;
-  text-align: center;
-  color: white;
-}
-
-/* Responsive layout - makes the two columns/boxes stack on top of each other instead of next to each other, on small screens */
-@media (max-width: 600px) {
-  nav, article {
-    width: 100%;
-    height: auto;
-  }
+/* Flexbox for the main layout */
+main {
+    display: flex;
+    justify-content: space-between;
+    background-color: transparent;
+    padding: 0;
 }
