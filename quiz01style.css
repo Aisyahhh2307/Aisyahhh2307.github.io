@@ -12,40 +12,43 @@ body {
     width: 90%;
     max-width: 1200px;
     margin: 20px auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Space between sections */
 }
 
 /* Common styling for all sections */
-header, nav, main, footer, aside, section {
+header, nav, main, footer {
     padding: 20px;
-    margin-bottom: 10px;
     border-radius: 8px;
-    box-sizing: border-box; /* Ensures padding doesn't affect width */
+}
+
+aside, section {
+    padding: 20px;
+    border-radius: 8px;
+    box-sizing: border-box;
 }
 
 /* Color and specific styling for each section */
-header, footer {
-    background-color: #d9534f; /* Red-like color */
+header, footer, aside {
+    background-color: #d9534f;
 }
 
-nav {
-    background-color: #f0ad4e; /* Orange-like color */
-}
-
-.content {
-    background-color: #f0ad4e; /* Orange-like color */
-    flex-grow: 1; /* Allows it to take up available space */
-    margin: 0 10px;
-}
-
-.sidebar-left, .sidebar-right {
-    background-color: #d9534f; /* Red-like color */
-    width: 250px; /* Fixed width for sidebars */
+nav, section {
+    background-color: #f0ad4e;
 }
 
 /* Flexbox for the main layout */
 main {
     display: flex;
     justify-content: space-between;
-    background-color: transparent;
-    padding: 0;
+    gap: 10px; /* Space between sidebars and content */
+}
+
+.sidebar-left, .sidebar-right {
+    flex-grow: 1; /* These sidebars will grow equally */
+}
+
+.content {
+    flex-grow: 2; /* This section will grow to be twice the size of a sidebar */
 }
