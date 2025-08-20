@@ -31,13 +31,15 @@
         margin-bottom: 10px;
       }
 
-      .navigation {
+      .navigations {
         display: flex;
-        background-color: #e0ffe0;
         padding: 15px;
         width: 200px;
-        flex-direction: column;
-        flex-grow: 1;
+      }
+
+      .navigation {
+        background-color:aquamarine;
+        padding: 15px;
       }
 
       .articles {
@@ -77,19 +79,18 @@
     <div class="container">
       <header class="header">Struktur HTML & CSS Flex</header>
       <div class="main-content">
-        <nav class="navigation">
-          <nav class="navigation1">
+        <div class="navigations">
+          <nav class="navigation">
             <ul>
               <li>Link 1</li>
             </ul>
-          </nav>  
-
-          <nav class="=navigation2">
+          </nav>
+          <nav class="navigation">
             <ul>
               <li>Link 2</li>
             </ul>
           </nav>
-        </nav>
+        </div>
         <div class="articles">
           <article class="article">
             <h3>Article 1</h3>
