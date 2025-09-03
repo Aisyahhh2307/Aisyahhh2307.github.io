@@ -1,0 +1,54 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #f4f4f9;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+header,
+footer {
+  background: #2c3e50;
+  color: white;
+  text-align: center;
+}
+
+/* Item GRID */
+.item {
+  background: #3498db;
+  color: white;
+  font-size: 2rem;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 15px;
+}
+
+/* CSS GRID */
+.grid-container {
+  display: grid; /* membuat agar menjadi GRID styling */
+  gap: 15px; /* Jarak antar element */
+  padding: 20px;
+
+  /* 3 kolom sama besar */
+  grid-template-columns: repeat(3, 1fr);
+
+  grid-template-rows: repeat(3, 150px); /* 3 baris dengan tinggi 150px */
+}
+
+/* Styling per item */
+/* Rumus = {CSS Selector}:nth-child({anak ke-n}) */
+.item:nth-child(1) {
+  grid-row: span 2; /* Memakai grid-row: span {angka} */
+}
+.item:nth-child(4) {
+  grid-row: span 2; /* Memakai grid-row: span {angka} */
+}
+
+.item:nth-child(2) {
+  grid-column: span 2; /* Memakai grid-column: span {angka} */
+}
