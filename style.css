@@ -33,6 +33,7 @@ footer {
   display: grid; /* membuat agar menjadi GRID styling */
   gap: 15px; /* Jarak antar element */
   padding: 20px;
+  background-color: #333;
 
   /* 3 kolom sama besar */
   grid-template-columns: repeat(3, 1fr);
