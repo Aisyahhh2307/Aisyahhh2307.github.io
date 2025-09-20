@@ -30,12 +30,16 @@ aside, section {
 }
 
 /* Color and specific styling for each section */
-header, footer, aside {
-    background-color: #d9534f;
+header, footer {
+    background-color: #3158a5;
+}
+
+aside {
+    background-color: #5d6e8f;
 }
 
 nav, section {
-    background-color: #f0ad4e;
+    background-color: #4eb5f0;
 }
 
 /* Flexbox for the main layout */
