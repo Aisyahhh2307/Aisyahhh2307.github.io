@@ -22,18 +22,36 @@ body{
     color: white;
 }
 
-.project1{
-    
+.project1 a{
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 20rem;
+    height: 20rem;
+    background-color: transparent;
+    border: 0.2rem #1234a3;
+    font-size: 2rem;
+    border-radius: 30%;
+    margin: 3rem 1.5rem 3rem 0;
+    transition: 0.3s ease;
+    color: #1234a3;
+    font-size: large;
 }
 
-.project1 h1{
-    font-size: medium;
+.project2 a{
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 20rem;
+    height: 20rem;
+    background-color: transparent;
+    border: 0.2rem #1234a3;
+    font-size: 2rem;
+    border-radius: 30%;
+    margin: 3rem 1.5rem 3rem 0;
+    transition: 0.3s ease;
     color: #1234a3;
-}
-
-.project2 h1{
-    font-size: medium;
-    color: #1234a3;
+    font-size: large;
 }
 
 .experience .project1:hover{
