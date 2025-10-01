@@ -22,22 +22,30 @@ body{
     color: white;
 }
 
-.social-icons a{
+.experience {
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    width: 10rem;
-    height: 10rem;
+    text-align: center;
+    width: 50px;
+    height: 50px;
     background-color: transparent;
     border: 0.2rem solid #1234a3;
     font-size: 2rem;
-    border-radius: 50%;
+    border-radius: 30%;
     margin: 3rem 1.5rem 3rem 0;
     transition: 0.3s ease;
     color: #1234a3;
 }
 
-.social-icons a:hover{
+.experience .project1:hover{
+    color: black;
+    transform: scale(1.3) translateY(-5px);
+    background-color: #1234a3;
+    box-shadow: 0 0 25px #1234a3;
+}
+
+.experience .project2:hover{
     color: black;
     transform: scale(1.3) translateY(-5px);
     background-color: #1234a3;
