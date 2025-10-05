@@ -338,10 +338,57 @@ span{
     box-shadow: 0 0 40px #1234a3;
 }
 
+/*Education Section*/
+.education {
+  background-color: black; 
+  text-align: center;
+}
+
+.education-container {
+  display: flex;
+  justify-content: center;
+  gap: 3rem;
+  flex-wrap: wrap;
+}
+
+.education-card {
+  background-color: #B3EBF2;
+  border-radius: 1rem;
+  padding: 2rem;
+  width: 250px;
+  transition: 0.3s ease;
+}
+
+.education-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 8px 20px #1234a3;
+}
+
+.education-card i {
+  font-size: 4rem;
+  color: #1234a3;
+  margin-bottom: 1rem;
+}
+
+.education-card h3 {
+  font-size: 2rem;
+  color: #1234a3;
+  margin-bottom: 1rem;
+}
+
+.education-card p {
+  font-size: 1.4rem;
+  color: #1234a3;
+}
+
 /* Experience Section */
 .experience {
   background-color: black; 
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .experience-container {
