@@ -346,7 +346,8 @@ span{
 
 .education-container {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
   gap: 3rem;
   flex-wrap: wrap;
 }
@@ -388,12 +389,10 @@ span{
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
 }
 
 .experience-container {
   display: flex;
-  justify-content: center;
   gap: 3rem;
   flex-wrap: wrap;
 }
@@ -407,7 +406,6 @@ span{
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
 }
 
 .experience-card:hover {
