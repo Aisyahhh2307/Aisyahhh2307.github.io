@@ -293,13 +293,12 @@ span{
   border-radius: 1rem;
   padding: 2rem;
   width: 250px;
-  box-shadow: 0 4px 8px rgba(140, 120, 160, 0.1);
   transition: 0.3s ease;
 }
 
 .skill-card:hover {
   transform: translateY(-10px);
-  box-shadow: 0 8px 20px rgba(140, 120, 160, 0.2);
+  box-shadow: 0 8px 20px #1234a3;
 }
 
 .skill-card i {
@@ -362,13 +361,14 @@ span{
   border-radius: 1rem;
   padding: 2rem;
   width: 250px;
-  box-shadow: 0 4px 8px #1234a3;
   transition: 0.3s ease;
+  display: flex;
+  align-items: center;
 }
 
 .experience-card:hover {
   transform: translateY(-10px);
-  box-shadow: 0 8px 20px rgba(140, 120, 160, 0.2);
+  box-shadow: 0 8px 20px #1234a3;
 }
 
 .experience-card i {
