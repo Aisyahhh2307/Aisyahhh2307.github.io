@@ -355,8 +355,6 @@ span{
   justify-content: center;
   gap: 3rem;
   flex-wrap: wrap;
-  text-align: center;
-  flex-direction: column;
 }
 
 .experience-card {
@@ -366,6 +364,7 @@ span{
   width: 250px;
   box-shadow: 0 4px 8px rgba(140, 120, 160, 0.1);
   transition: 0.3s ease;
+  text-align: center;
 }
 
 .experience-card:hover {
