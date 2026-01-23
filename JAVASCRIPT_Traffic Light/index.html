@@ -1,29 +1,20 @@
 <!DOCTYPE html>
 <html>
-<body style="text-align: center; font-family: Arial, sans-serif; padding-top: 50px;">
+<body style="text-align: center; padding-top: 50px;">
 
-    <h2>Traffic Light Visualization</h2>
-    <p>JavaScript changing the <b>src</b> attribute:</p>
+    <h2>Fixed Traffic Light</h2>
 
-    <div style="height: 250px; margin-bottom: 20px;">
+    <div style="height: 250px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
         <img id="myImage" 
              src="https://p7.hiclipart.com/preview/356/937/71/traffic-light-red-light-camera-clip-art-traffic-light.jpg" 
-             style="width: 100px; height: 200px; object-fit: contain;">
+             style="width: 150px; height: 250px; object-fit: contain;">
     </div>
 
-    <br>
-
-    <button onclick="document.getElementById('myImage').src='https://p7.hiclipart.com/preview/356/937/71/traffic-light-red-light-camera-clip-art-traffic-light.jpg'">
-        Turn Red
-    </button>
-
-    <button onclick="document.getElementById('myImage').src='https://img2.clipart-library.com/28/yellow-traffic-light-clipart/yellow-traffic-light-clipart-5.webp'">
-        Turn Yellow
-    </button>
-
-    <button onclick="document.getElementById('myImage').src='https://p7.hiclipart.com/preview/449/746/427/traffic-light-green-clip-art-light-traffic-traffic-light-transport-icon.jpg'">
-        Turn Green
-    </button>
+    <button onclick="document.getElementById('myImage').src='https://p7.hiclipart.com/preview/356/937/71/traffic-light-red-light-camera-clip-art-traffic-light.jpg'">Turn red</button>
+    
+    <button onclick="document.getElementById('myImage').src='https://img2.clipart-library.com/28/yellow-traffic-light-clipart/yellow-traffic-light-clipart-5.webp'">Turn yellow</button>
+    
+    <button onclick="document.getElementById('myImage').src='https://p7.hiclipart.com/preview/449/746/427/traffic-light-green-clip-art-light-traffic-traffic-light-transport-icon.jpg'">Turn green</button>
 
 </body>
 </html>
