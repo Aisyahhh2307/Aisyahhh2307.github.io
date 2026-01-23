@@ -1,28 +1,28 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Traffic Light Assignment</title>
-</head>
-<body style="text-align: center; font-family: sans-serif;">
+<body>
 
-    <h2>Traffic Light Visualization</h2>
-    <p>Click the buttons below to change the light status:</p>
 
-    <img id="myImage" 
-         src="https://www.w3schools.com/js/pic_bulboff.gif" 
-         style="width:100px; display:block; margin: 20px auto;">
+<h2>What Can JavaScript Do?</h2>
 
-    <button onclick="document.getElementById('myImage').src='https://p7.hiclipart.com/preview/356/937/71/traffic-light-red-light-camera-clip-art-traffic-light.jpg'">
-        Red
-    </button>
 
-    <button onclick="document.getElementById('myImage').src='https://img2.clipart-library.com/28/yellow-traffic-light-clipart/yellow-traffic-light-clipart-5.webp'">
-        Yellow
-    </button>
+<p>JavaScript can change HTML attribute values.</p>
 
-    <button onclick="document.getElementById('myImage').src='https://p7.hiclipart.com/preview/449/746/427/traffic-light-green-clip-art-light-traffic-traffic-light-transport-icon.jpg'">
-        Green
-    </button>
+
+<p>In this case JavaScript changes the value of the src (source) attribute of an image.</p>
+
+
+<button onclick="document.getElementById('myImage').src='https://p7.hiclipart.com/preview/356/937/71/traffic-light-red-light-camera-clip-art-traffic-light.jpg'">Turn red</button>
+
+
+<img id="myImage" src="https://p7.hiclipart.com/preview/356/937/71/traffic-light-red-light-camera-clip-art-traffic-light.jpg" style="width:100px">
+
+
+<button onclick="document.getElementById('myImage').src='https://img2.clipart-library.com/28/yellow-traffic-light-clipart/yellow-traffic-light-clipart-5.webp'">Turn yellow</button>
+
+
+<button onclick="document.getElementById('myImage').src='https://p7.hiclipart.com/preview/449/746/427/traffic-light-green-clip-art-light-traffic-traffic-light-transport-icon.jpg'">Turn green</button>
+
 
 </body>
 </html>
