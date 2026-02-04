@@ -8,7 +8,33 @@
 
 <body>
     <h2>Cek Bilangan Positif/Negatif</h2>
+    <input type="number" id="angkaInput" placeholder="...">
+    <button onclick="cekAngka()">Proses</button>
+    <p id="hasil"></p>
 
-    
+    <script>
+        function cekAngka() {
+            let angka = prompt();
+            let message;
+
+            if (!isNaN(angka)) {
+                if (angka > 0) {
+                    message = angka + " adalah bilangan positif.";
+                }
+                if else (angka < 0) {
+                    message = angka + " adalah bilangan negatif.";
+                }
+                else {
+                    message = angka + " adalah bilangan nol.";
+                }
+            }
+            else {
+                message = "Error: Input bukan angka!";
+            }
+
+            document.getElementById("hasil").innerHTML = message;
+        }
+    </script>
+
 </body>
 </html>
