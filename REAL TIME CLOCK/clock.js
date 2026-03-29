@@ -1,24 +1,28 @@
 const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-// const monthNames
-const weton = ["Wage", "Kliwon", "Legi", "Pahing", "Pon"];
+const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const wetonNames = ["Wage", "Kliwon", "Legi", "Pahing", "Pon"];
 
 function updateClock() {
     const now = new Date(); 
-    // year, month, date, day
+    let year = now.getFullYear();
+    let month = now.getMonth();
+    let date = now.getDate();
+    let day = now.getDay();
     let hours = now.getHours();
-    let displayHours = String(hours).padStart(2, '0');
     let minutes = now.getMinutes();
-    let displayMinutes = String(minutes).padStart(2, '0');
     let seconds = now.getSeconds();
+
+    let displayHours = String(hours).padStart(2, '0');
+    let displayMinutes = String(minutes).padStart(2, '0');
     let displaySeconds = String(seconds).padStart(2, '0');
 
-    let totalDays = Math.floor(now.getTime() / (1000 * 60 * 60 * 24));
+    let totalDays = Math.floor((now.getTime() + (7 * 60 * 60 * 1000)) / (1000 * 60 * 60 * 24));
     let wetonIndex = totalDays % 5;
 
-    //let dateString = 
-    //let timeString = 
+    let dateString = dayNames[day] + " (" + wetonNames[wetonIndex] + "), " + monthNames[month] + " " + date + ", " + year;
+    let timeString = displayHours + ":" + displayMinutes + ":" + displaySeconds;
 
-    document.getElementById('time').innerText = dateString;
+    document.getElementById('date').innerText = dateString;
     document.getElementById('time').innerText = timeString;
 }
 
