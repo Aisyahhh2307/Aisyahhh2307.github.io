@@ -16,10 +16,12 @@ function updateClock() {
     let displayMinutes = String(minutes).padStart(2, '0');
     let displaySeconds = String(seconds).padStart(2, '0');
 
-    let totalDays = Math.floor((now.getTime() + (7 * 60 * 60 * 1000)) / (1000 * 60 * 60 * 24));
+    let localOffset = now.getTimezoneOffset() * 60 * 1000 * -1; 
+//getTimezoneOffset() returns time in minutes; -1 is used to find the local time from UTC
+    let totalDays = Math.floor((now.getTime() + localOffset) / (1000 * 60 * 60 * 24));
     let wetonIndex = totalDays % 5;
 
-    let dateString = dayNames[day] + " (" + wetonNames[wetonIndex] + "), " + monthNames[month] + " " + date + ", " + year;
+    let dateString = dayNames[day] + ", " + monthNames[month] + " " + date + ", " + year + + " (" + wetonNames[wetonIndex] + "), ";
     let timeString = displayHours + ":" + displayMinutes + ":" + displaySeconds;
 
     document.getElementById('date').innerText = dateString;
