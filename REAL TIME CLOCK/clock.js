@@ -21,7 +21,7 @@ function updateClock() {
     let totalDays = Math.floor((now.getTime() + localOffset) / (1000 * 60 * 60 * 24));
     let wetonIndex = totalDays % 5;
 
-    let dateString = dayNames[day] + ", " + monthNames[month] + " " + date + ", " + year + + " (" + wetonNames[wetonIndex] + "), ";
+    let dateString = dayNames[day] + ", " + monthNames[month] + " " + date + ", " + year + " (" + wetonNames[wetonIndex] + "), ";
     let timeString = displayHours + ":" + displayMinutes + ":" + displaySeconds;
 
     document.getElementById('date').innerText = dateString;
