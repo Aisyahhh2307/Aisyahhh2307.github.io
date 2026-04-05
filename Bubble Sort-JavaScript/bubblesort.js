@@ -1,7 +1,14 @@
 function bubbleSort() {
     let input = prompt("Input array without any space: ");
     if (!input) return;
-    let array = input.split(",").map(Number).filter(num => !isNaN(num));
+
+    let array = input.split(/\s*,\s*/).filter(item => item.trim() !== "").map(Number).filter(num => !isNaN(num));        
+    
+    if (array.length === 0) {
+        document.getElementById("hasil").innerHTML = "No valid numbers to sort!";
+        return;
+    }
+
     let message = "";
     let stepCount = 1;
 
