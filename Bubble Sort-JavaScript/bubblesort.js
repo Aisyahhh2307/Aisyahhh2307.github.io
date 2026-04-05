@@ -22,7 +22,7 @@ function bubbleSort() {
                 
                 swap = true;
 
-                message += "Step " + (stepCount) + ": " + array + "<br>";
+                message += "Step " + (stepCount) + ": [" + array + "]<br>";
                 stepCount++;
             } 
         }
