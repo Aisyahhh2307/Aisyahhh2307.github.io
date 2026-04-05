@@ -1,5 +1,5 @@
 function bubbleSort() {
-    let input = prompt("Input array (use commas to separate): ")
+    let input = prompt("Input array without any space or trailing punctuation (use commas to separate): ")
 
     let array = input.split(/\s*,\s*/).filter(item => item.trim() !== "").map(Number).filter(num => !isNaN(num));        
     
