@@ -1,8 +1,7 @@
 function bubbleSort() {
-    let input = prompt("Input array without any space or trailing punctuation: ");
-    if (!input) return;
+    let input = prompt("Input array (use commas to separate): ")
 
-    let array = input.split(/\s*,\s*/).map(item => item.trim()).filter(item => item.trim() !== "").map(Number).filter(num => !isNaN(num));        
+    let array = input.split(/\s*,\s*/).filter(item => item.trim() !== "").map(Number).filter(num => !isNaN(num));        
     
     if (array.length === 0) {
         document.getElementById("hasil").innerHTML = "No valid numbers to sort!";
