@@ -3,271 +3,243 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Merge Sort Game</title>
+    <title>Merge Sort: Step-by-Step Master</title>
     <style>
         :root {
             --bg: #0f172a;
             --card: #1e293b;
-            --accent: #38bdf8;
-            --success: #22c55e;
-            --error: #ef4444;
+            --accent: #f59e0b; /* Amber for active elements */
+            --node: #334155;
             --text: #f8fafc;
+            --highlight: #10b981;
         }
 
         body {
-            font-family: 'Inter', system-ui, sans-serif;
+            font-family: 'Courier New', Courier, monospace;
             background-color: var(--bg);
             color: var(--text);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
             margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
         }
 
-        .game-container {
-            background: var(--card);
-            padding: 2.5rem;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            width: 90%;
-            max-width: 700px;
+        .status-panel {
             text-align: center;
-            border: 1px solid #334155;
-        }
-
-        .stats {
-            display: flex;
-            justify-content: space-between;
             margin-bottom: 20px;
-            font-weight: bold;
-            color: var(--accent);
-        }
-
-        .timer-bar {
-            width: 100%;
-            height: 6px;
-            background: #334155;
-            border-radius: 3px;
-            margin-bottom: 20px;
-            overflow: hidden;
-        }
-
-        #progress {
-            height: 100%;
-            background: var(--accent);
-            width: 100%;
-            transition: width 0.1s linear;
-        }
-
-        .array-zone {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .sub-array {
-            background: rgba(255,255,255,0.05);
             padding: 15px;
+            background: var(--card);
             border-radius: 8px;
+            border: 1px solid var(--accent);
+            width: 80%;
         }
 
-        .box-wrapper {
+        .tree-container {
             display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            justify-content: center;
-            margin-top: 10px;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
+            width: 100%;
         }
 
-        .box {
-            width: 45px;
-            height: 45px;
-            background: var(--accent);
-            color: var(--bg);
+        .level-row {
+            display: flex;
+            justify-content: center;
+            gap: 50px;
+            width: 100%;
+        }
+
+        .array-node {
+            display: flex;
+            background: var(--node);
+            padding: 5px;
+            border-radius: 4px;
+            gap: 4px;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .array-node.active {
+            border-color: var(--accent);
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+        }
+
+        .element {
+            width: 35px;
+            height: 35px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 6px;
-            font-weight: 800;
-            font-size: 1.1rem;
-        }
-
-        .merge-zone {
-            padding: 20px;
-            border: 2px solid #334155;
-            border-radius: 12px;
-            background: rgba(0,0,0,0.2);
-        }
-
-        .input-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: center;
-            margin: 15px 0;
-        }
-
-        input {
-            width: 50px;
-            height: 50px;
-            background: #0f172a;
-            border: 2px solid #334155;
-            border-radius: 8px;
-            color: white;
-            text-align: center;
-            font-size: 1.2rem;
-            outline: none;
-        }
-
-        input:focus { border-color: var(--accent); }
-
-        button {
-            background: var(--accent);
-            color: var(--bg);
-            border: none;
-            padding: 12px 30px;
-            border-radius: 8px;
-            font-weight: bold;
+            background: #475569;
+            border-radius: 2px;
             cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            user-select: none;
         }
 
-        button:hover { opacity: 0.9; }
+        .element.empty {
+            background: #1e293b;
+            border: 1px dashed #64748b;
+            color: transparent;
+        }
 
-        #msg { margin-top: 15px; min-height: 24px; }
-        .shake { animation: shake 0.5s; }
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            75% { transform: translateX(10px); }
+        .element.correct { background: var(--highlight); }
+        .element:hover:not(.empty) { background: #64748b; }
+
+        .instruction {
+            color: var(--accent);
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin: 10px 0;
+        }
+
+        #reset-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
 
-<div class="game-container">
-    <div class="stats">
-        <span>LEVEL: <span id="level-val">1</span></span>
-        <span>SCORE: <span id="score-val">0</span></span>
-    </div>
-    
-    <div class="timer-bar"><div id="progress"></div></div>
-
-    <h2>The Final Merge</h2>
-    <p style="color: #94a3b8;">Combine the sorted arrays into one master list!</p>
-
-    <div class="array-zone">
-        <div class="sub-array">
-            <small>Left Branch</small>
-            <div id="left-box" class="box-wrapper"></div>
-        </div>
-        <div class="sub-array">
-            <small>Right Branch</small>
-            <div id="right-box" class="box-wrapper"></div>
-        </div>
+    <div class="status-panel">
+        <h1>Merge Sort Simulator</h1>
+        <div id="phase-text" class="instruction">Phase: Dividing</div>
+        <p id="hint">Click the element that represents the middle to split the array.</p>
     </div>
 
-    <div class="merge-zone">
-        <div id="input-container" class="input-grid"></div>
-        <button onclick="verify()">Submit Sequence</button>
+    <div class="tree-container" id="game-board">
+        <!-- Rows will be injected here -->
     </div>
 
-    <div id="msg"></div>
-</div>
+    <button id="reset-btn" onclick="initGame()">Restart Experiment</button>
 
 <script>
-    let level = 1;
-    let score = 0;
-    let solution = [];
-    let timeLeft = 100;
-    let timerInterval;
+    // Logic: We'll simulate a 4-element merge sort for clarity
+    let data = [];
+    let step = 0; 
+    // Steps: 
+    // 0: Split [0,1,2,3] -> [0,1] [2,3]
+    // 1: Split [0,1] -> [0], [1]
+    // 2: Split [2,3] -> [2], [3]
+    // 3: Merge [0] & [1] -> [0,1]
+    // 4: Merge [2] & [3] -> [2,3]
+    // 5: Merge [0,1] & [2,3] -> [0,1,2,3]
 
-    function startGame() {
-        clearInterval(timerInterval);
-        timeLeft = 100;
-        const size = 2 + Math.floor(level / 2); // Gets harder every 2 levels
-        
-        // Generate two sorted arrays
-        let left = Array.from({length: size}, () => Math.floor(Math.random() * 50)).sort((a,b) => a-b);
-        let right = Array.from({length: size}, () => Math.floor(Math.random() * 50)).sort((a,b) => a-b);
-        solution = [...left, ...right].sort((a,b) => a-b);
-
-        // Render
-        renderBoxes('left-box', left);
-        renderBoxes('right-box', right);
-        
-        const container = document.getElementById('input-container');
-        container.innerHTML = '';
-        solution.forEach((_, i) => {
-            const input = document.createElement('input');
-            input.type = 'number';
-            input.id = `in-${i}`;
-            // Auto-focus next input
-            input.oninput = function() {
-                if(this.value && document.getElementById(`in-${i+1}`)) {
-                    document.getElementById(`in-${i+1}`).focus();
-                }
-            };
-            container.appendChild(input);
-        });
-
-        startTimer();
+    function initGame() {
+        data = Array.from({length: 4}, () => Math.floor(Math.random() * 50));
+        step = 0;
+        renderBoard();
     }
 
-    function renderBoxes(id, arr) {
-        const el = document.getElementById(id);
-        el.innerHTML = arr.map(n => `<div class="box">${n}</div>`).join('');
-    }
-
-    function startTimer() {
-        const bar = document.getElementById('progress');
-        const duration = Math.max(10, 30 - level); // Time decreases as level goes up
-        let step = 100 / (duration * 10);
+    function renderBoard() {
+        const board = document.getElementById('game-board');
+        board.innerHTML = '';
         
-        timerInterval = setInterval(() => {
-            timeLeft -= step;
-            bar.style.width = timeLeft + "%";
-            if(timeLeft <= 0) {
-                gameOver("Time's up! The arrays collapsed.");
+        // Phase labels and hints
+        const phaseText = document.getElementById('phase-text');
+        const hint = document.getElementById('hint');
+
+        // Create the rows (Simplified visualization)
+        const rows = {
+            top: createRow('top'),
+            mid: createRow('mid'),
+            bot: createRow('bot')
+        };
+
+        // Logic based on step
+        if (step === 0) {
+            phaseText.innerText = "Phase: Dividing (Lvl 1)";
+            hint.innerText = "The algorithm finds the mid-point. Click a middle element to split.";
+            addArray(rows.top, data, true, (idx) => {
+                if(idx === 1 || idx === 2) nextStep();
+            });
+        } 
+        else if (step === 1) {
+            phaseText.innerText = "Phase: Dividing (Lvl 2)";
+            hint.innerText = "Split the left sub-array into single elements.";
+            addArray(rows.top, data, false);
+            addArray(rows.mid, data.slice(0,2), true, () => nextStep());
+            addArray(rows.mid, data.slice(2,4), false);
+        }
+        else if (step === 2) {
+            phaseText.innerText = "Phase: Dividing (Lvl 2)";
+            hint.innerText = "Now split the right sub-array.";
+            addArray(rows.top, data, false);
+            addArray(rows.mid, data.slice(0,2), false);
+            addArray(rows.mid, data.slice(2,4), true, () => nextStep());
+        }
+        else if (step >= 3) {
+            phaseText.innerText = "Phase: Merging (Conquer)";
+            hint.innerText = "Compare the smallest available elements. Click the SMALLER one to move it up.";
+            
+            // Show the single nodes at the bottom
+            addArray(rows.bot, [data[0]], step === 3);
+            addArray(rows.bot, [data[1]], step === 3);
+            addArray(rows.bot, [data[2]], step === 4);
+            addArray(rows.bot, [data[3]], step === 4);
+
+            if (step === 3) {
+                // Merging first two
+                let sortedPair = [data[0], data[1]].sort((a,b)=>a-b);
+                addArray(rows.mid, ["?", "?"], false); 
+                // To keep it simple, clicking either progresses the logic for this demo
+                // In a full game, we'd check if user clicked the smaller of the two bots
+                const bots = rows.bot.querySelectorAll('.element');
+                bots.forEach(el => el.onclick = () => {
+                    const val = parseInt(el.innerText);
+                    const otherVal = parseInt(data[0] === val ? data[1] : data[0]);
+                    if (val <= otherVal) nextStep();
+                    else alert("Wrong! In Merge Sort, we always pick the smaller element first.");
+                });
             }
-        }, 100);
-    }
-
-    function verify() {
-        let userInputs = [];
-        for(let i=0; i<solution.length; i++) {
-            userInputs.push(parseInt(document.getElementById(`in-${i}`).value));
+            else if (step === 4) {
+                let leftPair = [data[0], data[1]].sort((a,b)=>a-b);
+                addArray(rows.mid, leftPair, false);
+                addArray(rows.mid, ["?", "?"], false);
+                const bots = rows.bot.querySelectorAll('.element');
+                // Target elements 2 and 3
+                [bots[2], bots[3]].forEach(el => el.onclick = () => nextStep());
+            }
+            else {
+                phaseText.innerText = "CONGRATULATIONS!";
+                hint.innerText = "You have successfully completed the Merge Sort recursion!";
+                addArray(rows.top, data.slice().sort((a,b)=>a-b), false, null, true);
+            }
         }
 
-        if(JSON.stringify(userInputs) === JSON.stringify(solution)) {
-            level++;
-            score += 100 * level;
-            document.getElementById('level-val').innerText = level;
-            document.getElementById('score-val').innerText = score;
-            document.getElementById('msg').innerHTML = "<span style='color:var(--success)'>Level Complete! Next phase initiating...</span>";
-            setTimeout(startGame, 1500);
-        } else {
-            document.querySelector('.game-container').classList.add('shake');
-            setTimeout(() => document.querySelector('.game-container').classList.remove('shake'), 500);
-            document.getElementById('msg').innerHTML = "<span style='color:var(--error)'>Logic Error! Sequence incorrect.</span>";
-        }
+        Object.values(rows).forEach(r => board.appendChild(r));
     }
 
-    function gameOver(reason) {
-        clearInterval(timerInterval);
-        alert(reason + "\nFinal Score: " + score);
-        level = 1;
-        score = 0;
-        document.getElementById('level-val').innerText = level;
-        document.getElementById('score-val').innerText = score;
-        startGame();
+    function createRow(className) {
+        const div = document.createElement('div');
+        div.className = 'level-row ' + className;
+        return div;
     }
 
-    startGame();
+    function addArray(row, items, active, callback, highlight=false) {
+        const node = document.createElement('div');
+        node.className = `array-node ${active ? 'active' : ''}`;
+        items.forEach((item, idx) => {
+            const el = document.createElement('div');
+            el.className = `element ${item === '?' ? 'empty' : ''} ${highlight ? 'correct' : ''}`;
+            el.innerText = item;
+            if(active && callback) el.onclick = () => callback(idx);
+            node.appendChild(el);
+        });
+        row.appendChild(node);
+    }
+
+    function nextStep() {
+        step++;
+        renderBoard();
+    }
+
+    initGame();
 </script>
-
 </body>
 </html>
