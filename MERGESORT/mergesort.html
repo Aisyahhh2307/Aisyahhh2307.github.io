@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Merge Sort: Step-by-Step Master</title>
+    <title>Merge Sort: Animated Master</title>
     <style>
         :root {
             --bg: #0f172a;
@@ -24,6 +24,7 @@
             flex-direction: column;
             align-items: center;
             padding: 20px;
+            overflow-x: hidden;
         }
 
         .status-panel {
@@ -34,21 +35,24 @@
             border-radius: 8px;
             border: 1px solid var(--accent);
             width: 80%;
+            z-index: 10;
         }
 
         .tree-container {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 30px;
+            gap: 60px;
             width: 100%;
+            position: relative;
         }
 
         .level-row {
             display: flex;
             justify-content: center;
-            gap: 30px;
+            gap: 40px;
             width: 100%;
+            min-height: 50px;
         }
 
         .array-node {
@@ -57,7 +61,7 @@
             padding: 5px;
             border-radius: 4px;
             gap: 4px;
-            transition: all 0.3s;
+            position: relative;
             border: 2px solid transparent;
         }
 
@@ -67,8 +71,8 @@
         }
 
         .element {
-            width: 32px;
-            height: 32px;
+            width: 35px;
+            height: 35px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -76,7 +80,14 @@
             border-radius: 2px;
             cursor: pointer;
             user-select: none;
-            font-size: 0.9rem;
+            font-weight: bold;
+            transition: transform 0.5s ease-in-out, opacity 0.3s, background 0.3s;
+        }
+
+        .element.moving {
+            z-index: 100;
+            pointer-events: none;
+            background: var(--accent);
         }
 
         .element.empty {
@@ -86,7 +97,6 @@
         }
 
         .element.correct { background: var(--highlight); }
-        .element:hover:not(.empty) { background: #64748b; }
 
         .instruction {
             color: var(--accent);
@@ -95,27 +105,17 @@
             margin: 10px 0;
         }
 
-        #next-lvl-btn {
-            display: none;
+        button {
             padding: 10px 20px;
-            background: var(--highlight);
-            color: white;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             font-weight: bold;
-            margin-top: 20px;
+            margin: 10px;
         }
 
-        #reset-btn {
-            background: var(--error);
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-top: 20px;
-        }
+        #reset-btn { background: var(--error); color: white; }
+        #next-lvl-btn { background: var(--highlight); color: white; display: none; }
     </style>
 </head>
 <body>
@@ -128,7 +128,7 @@
 
     <div class="tree-container" id="game-board"></div>
 
-    <div style="display: flex; gap: 10px;">
+    <div>
         <button id="reset-btn" onclick="initGame()">Restart Level</button>
         <button id="next-lvl-btn" onclick="nextLevel()">Next Level</button>
     </div>
@@ -137,9 +137,11 @@
     let currentLevel = 1;
     let data = [];
     let step = 0;
+    let isAnimating = false;
 
     function initGame() {
         step = 0;
+        isAnimating = false;
         const size = currentLevel === 1 ? 4 : 8;
         document.getElementById('lvl-title').innerText = `Level ${currentLevel} (${size} Elements)`;
         document.getElementById('next-lvl-btn').style.display = 'none';
@@ -166,7 +168,7 @@
 
     function runLevel1(rows, phaseText, hint) {
         if (step === 0) {
-            addArray(rows.r0, data, true, (idx) => { if(idx === 1 || idx === 2) { step++; renderBoard(); }});
+            addArray(rows.r0, data, true, (idx, el) => { if(idx === 1 || idx === 2) { step++; renderBoard(); }});
         } else if (step === 1) {
             addArray(rows.r0, data, false);
             addArray(rows.r1, data.slice(0,2), true, () => { step++; renderBoard(); });
@@ -177,32 +179,29 @@
             addArray(rows.r1, data.slice(2,4), true, () => { step++; renderBoard(); });
         } else if (step >= 3) {
             phaseText.innerText = "Phase: Merging";
-            hint.innerText = "Compare sub-arrays. Pick the smallest available value!";
+            hint.innerText = "Watch the numbers fly! Pick the smallest to merge.";
             
-            addArray(rows.r3, [data[0]], step === 3);
-            addArray(rows.r3, [data[1]], step === 3);
-            addArray(rows.r3, [data[2]], step === 4);
-            addArray(rows.r3, [data[3]], step === 4);
+            addArray(rows.r3, [data[0]], step === 3, (i, el) => handleMergeClick(el, data[0], data[1]));
+            addArray(rows.r3, [data[1]], step === 3, (i, el) => handleMergeClick(el, data[1], data[0]));
+            addArray(rows.r3, [data[2]], step === 4, (i, el) => handleMergeClick(el, data[2], data[3]));
+            addArray(rows.r3, [data[3]], step === 4, (i, el) => handleMergeClick(el, data[3], data[2]));
 
             if (step === 3) {
-                addArray(rows.r2, ["?", "?"], false);
-                validateChoice(rows.r3, data[0], data[1], 0, 1);
+                addArray(rows.r2, ["?", "?"], false, null, false, "target-node");
             } else if (step === 4) {
                 addArray(rows.r2, [data[0], data[1]].sort((a,b)=>a-b), false);
-                addArray(rows.r2, ["?", "?"], false);
-                validateChoice(rows.r3, data[2], data[3], 2, 3);
+                addArray(rows.r2, ["?", "?"], false, null, false, "target-node");
             } else {
                 addArray(rows.r0, [...data].sort((a,b)=>a-b), false, null, true);
-                phaseText.innerText = "Level 1 Complete!";
+                phaseText.innerText = "Level 1 Sorted!";
                 document.getElementById('next-lvl-btn').style.display = 'block';
             }
         }
     }
 
     function runLevel2(rows, phaseText, hint) {
-        // Level 2 follows the same strict logic for 8 elements
         if (step < 7) {
-            phaseText.innerText = "Phase: Dividing (8 Elements)";
+            phaseText.innerText = "Phase: Dividing";
             addArray(rows.r0, data, step === 0, (i) => { if(i >= 3 && i <= 4) step = 1; renderBoard(); });
             if(step >= 1) {
                 addArray(rows.r1, data.slice(0,4), step === 1, (i) => { if(i==1||i==2) step = 2; renderBoard(); });
@@ -214,37 +213,49 @@
                 addArray(rows.r2, data.slice(4,6), step === 5, () => { step = 6; renderBoard(); });
                 addArray(rows.r2, data.slice(6,8), step === 6, () => { step = 7; renderBoard(); });
             }
-        } else {
+        } else if (step < 11) {
             phaseText.innerText = "Phase: Merging";
-            hint.innerText = "Only the smallest value of the pair will progress!";
-            for(let i=0; i<8; i++) addArray(rows.r3, [data[i]], step === 7+Math.floor(i/2));
-            
-            if (step < 11) {
-                let start = (step - 7) * 2;
-                validateChoice(rows.r3, data[start], data[start+1], start, start+1);
-            } else {
-                addArray(rows.r0, [...data].sort((a,b)=>a-b), false, null, true);
-                phaseText.innerText = "Master Level Complete!";
+            let pairIdx = step - 7;
+            for(let i=0; i<4; i++) {
+                let isActive = (i === pairIdx);
+                let nodeClass = isActive ? "target-node" : "";
+                addArray(rows.r2, isActive ? ["?", "?"] : [data[i*2], data[i*2+1]].sort((a,b)=>a-b), false, null, false, nodeClass);
+                addArray(rows.r3, [data[i*2]], isActive, (idx, el) => handleMergeClick(el, data[i*2], data[i*2+1]));
+                addArray(rows.r3, [data[i*2+1]], isActive, (idx, el) => handleMergeClick(el, data[i*2+1], data[i*2]));
             }
+        } else {
+            addArray(rows.r0, [...data].sort((a,b)=>a-b), false, null, true);
+            phaseText.innerText = "Master Level Sorted!";
         }
     }
 
-    function validateChoice(rowEl, v1, v2, idx1, idx2) {
-        const cells = rowEl.querySelectorAll('.element');
-        // We only care about the cells currently in 'active' comparison
-        [cells[idx1], cells[idx2]].forEach(el => {
-            el.onclick = () => {
-                const val = parseInt(el.innerText);
-                const otherVal = (val === v1) ? v2 : v1;
-                
-                if (val <= otherVal) {
-                    step++;
-                    renderBoard();
-                } else {
-                    alert(`Incorrect! ${val} is larger than ${otherVal}. Merge Sort must pick the smallest first.`);
-                }
-            };
-        });
+    function handleMergeClick(element, val, otherVal) {
+        if (isAnimating) return;
+        if (val > otherVal) {
+            alert(`Wait! ${val} is larger than ${otherVal}. Pick the smallest one!`);
+            return;
+        }
+
+        isAnimating = true;
+        const targetNode = document.querySelector('.target-node .empty');
+        if (!targetNode) return;
+
+        // Calculate positions
+        const startRect = element.getBoundingClientRect();
+        const endRect = targetNode.getBoundingClientRect();
+
+        const deltaX = endRect.left - startRect.left;
+        const deltaY = endRect.top - startRect.top;
+
+        // Apply animation
+        element.classList.add('moving');
+        element.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+
+        setTimeout(() => {
+            step++;
+            isAnimating = false;
+            renderBoard();
+        }, 500);
     }
 
     function createRow() {
@@ -253,14 +264,14 @@
         return div;
     }
 
-    function addArray(row, items, active, callback, highlight=false) {
+    function addArray(row, items, active, callback, highlight=false, extraClass="") {
         const node = document.createElement('div');
-        node.className = `array-node ${active ? 'active' : ''}`;
+        node.className = `array-node ${active ? 'active' : ''} ${extraClass}`;
         items.forEach((item, idx) => {
             const el = document.createElement('div');
             el.className = `element ${item === '?' ? 'empty' : ''} ${highlight ? 'correct' : ''}`;
             el.innerText = item;
-            if(active && callback) el.onclick = () => callback(idx);
+            if(active && callback) el.onclick = () => callback(idx, el);
             node.appendChild(el);
         });
         row.appendChild(node);
