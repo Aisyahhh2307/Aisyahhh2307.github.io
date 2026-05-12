@@ -3,206 +3,224 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interpolation Search Interactive Quiz</title>
+    <title>Interpolation Search: The Game</title>
     <style>
         :root {
-            --primary: #4a90e2;
-            --secondary: #f39c12;
-            --dark: #2c3e50;
-            --light: #ecf0f1;
-            --success: #27ae60;
-            --error: #e74c3c;
+            --primary: #2980b9;
+            --secondary: #8e44ad;
+            --accent: #27ae60;
+            --bg: #f4f7f6;
+            --text: #2c3e50;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--light);
-            color: var(--dark);
-            line-height: 1.6;
-            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
             padding: 20px;
         }
 
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
+        .game-card {
             background: white;
+            max-width: 700px;
+            width: 100%;
             padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
         }
 
-        h1, h2 { color: var(--primary); text-align: center; }
-
-        .formula {
-            background: #f8f9fa;
+        .formula-box {
+            background: #eef2f3;
             padding: 15px;
+            border-radius: 8px;
+            font-size: 0.9em;
+            margin-bottom: 20px;
             border-left: 5px solid var(--primary);
-            font-family: 'Courier New', Courier, monospace;
-            margin: 20px 0;
-            text-align: center;
         }
 
-        .quiz-section {
-            border-top: 2px solid var(--light);
-            margin-top: 30px;
-            padding-top: 20px;
-        }
-
-        .question {
-            font-weight: bold;
-            margin-bottom: 15px;
-            font-size: 1.1em;
-        }
-
-        .options {
-            display: grid;
+        .array-container {
+            display: flex;
+            flex-wrap: wrap;
             gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .array-item {
+            width: 45px;
+            height: 45px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            background: #fff;
+            transition: 0.3s;
+        }
+
+        .index-label { font-size: 0.7em; color: #7f8c8d; margin-top: -5px; }
+        .value-label { font-weight: bold; }
+
+        .active-range { border-color: var(--primary); background: #ebf5fb; }
+        .probed { background: var(--secondary); color: white; border-color: var(--secondary); }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        input {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            width: 80px;
+            text-align: center;
         }
 
         button {
-            padding: 12px;
-            border: 2px solid var(--primary);
-            background: white;
-            border-radius: 6px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
             cursor: pointer;
-            transition: 0.3s;
-            font-size: 16px;
-        }
-
-        button:hover {
-            background: var(--primary);
-            color: white;
-        }
-
-        #feedback {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 6px;
-            display: none;
             font-weight: bold;
-            text-align: center;
+            transition: 0.2s;
         }
 
-        .correct { background-color: #d4edda; color: var(--success); }
-        .incorrect { background-color: #f8d7da; color: var(--error); }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-refresh { background: #95a5a6; color: white; margin-top: 10px; }
+        button:hover { opacity: 0.8; }
 
-        .progress {
-            text-align: right;
-            font-size: 0.9em;
-            color: #7f8c8d;
-        }
+        #message { margin-top: 15px; font-weight: bold; text-align: center; min-height: 24px; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>🔍 Interpolation Search Master</h1>
+<div class="game-card">
+    <h2>🎯 Interpolation Search Game</h2>
+    <p>Find the <b>Target Value</b> by calculating the next position (pos) using the formula:</p>
     
-    <p>Interpolation Search is an algorithm for searching for a key in an <b>sorted</b> array of uniformly distributed values.</p>
-    
-    <div class="formula">
-        pos = low + [ ((high - low) / (arr[high] - arr[low])) * (x - arr[low]) ]
+    <div class="formula-box">
+        <strong>Formula:</strong> pos = low + [ ( (high - low) / (arr[high] - arr[low]) ) * (target - arr[low]) ]
+        <br><small>*Note: Round the result down (Floor) if it's a decimal.</small>
     </div>
 
-    <div class="quiz-section" id="quiz-container">
-        <div class="progress">Question <span id="q-number">1</span> of 3</div>
-        <div id="quiz-content">
-            <p class="question" id="question-text"></p>
-            <div class="options" id="options-container"></div>
-        </div>
-        <div id="feedback"></div>
-        <button id="next-btn" style="display:none; margin-top:20px; width:100%; background: var(--dark); color:white;">Next Question</button>
+    <div style="text-align: center; font-size: 1.2em;">
+        Target Value: <span id="target-display" style="color: var(--secondary); font-weight: bold;">--</span>
     </div>
+
+    <div class="array-container" id="array-display"></div>
+
+    <div class="controls">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span>Current Low Index: <b id="low-val">0</b></span>
+            <span>Current High Index: <b id="high-val">0</b></span>
+        </div>
+        <hr>
+        <div style="text-align: center;">
+            <label>Calculate & Enter Next Index (pos): </label>
+            <input type="number" id="user-input" placeholder="?">
+            <button class="btn-primary" onclick="checkStep()">Submit Probe</button>
+        </div>
+    </div>
+
+    <div id="message"></div>
+    <button class="btn-refresh" onclick="initGame()" style="width: 100%;">🔄 New Random Game</button>
 </div>
 
 <script>
-    const quizData = [
-        {
-            question: "What is the primary requirement for Interpolation Search to work efficiently?",
-            options: ["The array must be unsorted", "Values must be uniformly distributed and sorted", "The array must contain only strings", "The array must be very small"],
-            answer: 1,
-            explanation: "Interpolation search relies on the values being sorted and ideally uniformly distributed to accurately estimate the position."
-        },
-        {
-            question: "What is the average time complexity of Interpolation Search?",
-            options: ["O(n)", "O(log n)", "O(log(log n))", "O(n^2)"],
-            answer: 2,
-            explanation: "For uniformly distributed data, Interpolation Search is incredibly fast, averaging O(log(log n))."
-        },
-        {
-            question: "If we search for 70 in [10, 20, 30, 40, 50, 60, 70, 80], where will the algorithm likely look first?",
-            options: ["At the beginning (Index 0)", "Right at the middle (Index 3/4)", "Near the end (Index 6)", "It picks a random index"],
-            answer: 2,
-            explanation: "Because 70 is closer to the maximum value (80) than the minimum (10), the formula probes near the end of the array."
+    let arr = [];
+    let low, high, target;
+    let gameOver = false;
+
+    function initGame() {
+        // Generate random sorted array
+        arr = [];
+        let start = Math.floor(Math.random() * 20);
+        for(let i=0; i<12; i++) {
+            start += Math.floor(Math.random() * 15) + 5;
+            arr.push(start);
         }
-    ];
 
-    let currentQuestion = 0;
-    let score = 0;
+        low = 0;
+        high = arr.length - 1;
+        target = arr[Math.floor(Math.random() * arr.length)];
+        gameOver = false;
+        
+        document.getElementById('target-display').innerText = target;
+        document.getElementById('message').innerText = "Game started! Calculate the first position.";
+        document.getElementById('message').style.color = "initial";
+        document.getElementById('user-input').value = "";
+        
+        updateDisplay();
+    }
 
-    const questionText = document.getElementById('question-text');
-    const optionsContainer = document.getElementById('options-container');
-    const feedback = document.getElementById('feedback');
-    const nextBtn = document.getElementById('next-btn');
-    const qNumber = document.getElementById('q-number');
-
-    function loadQuestion() {
-        const q = quizData[currentQuestion];
-        questionText.innerText = q.question;
-        qNumber.innerText = currentQuestion + 1;
-        optionsContainer.innerHTML = '';
-        feedback.style.display = 'none';
-        nextBtn.style.display = 'none';
-
-        q.options.forEach((opt, index) => {
-            const btn = document.createElement('button');
-            btn.innerText = opt;
-            btn.onclick = () => checkAnswer(index);
-            optionsContainer.appendChild(btn);
+    function updateDisplay() {
+        const container = document.getElementById('array-display');
+        container.innerHTML = '';
+        
+        arr.forEach((val, i) => {
+            const div = document.createElement('div');
+            div.className = 'array-item';
+            if (i >= low && i <= high) div.classList.add('active-range');
+            
+            div.innerHTML = `
+                <span class="value-label">${val}</span>
+                <span class="index-label">${i}</span>
+            `;
+            container.appendChild(div);
         });
+
+        document.getElementById('low-val').innerText = low;
+        document.getElementById('high-val').innerText = high;
     }
 
-    function checkAnswer(choice) {
-        const q = quizData[currentQuestion];
-        feedback.style.display = 'block';
+    function checkStep() {
+        if (gameOver) return;
+
+        const userInput = parseInt(document.getElementById('user-input').value);
         
-        // Disable all buttons
-        const buttons = optionsContainer.querySelectorAll('button');
-        buttons.forEach(b => b.disabled = true);
+        // Calculate the correct position using the formula
+        const numerator = (high - low);
+        const denominator = (arr[high] - arr[low]);
+        const fraction = (target - arr[low]);
+        const correctPos = low + Math.floor((numerator / denominator) * fraction);
 
-        if(choice === q.answer) {
-            score++;
-            feedback.className = 'correct';
-            feedback.innerText = "Correct! " + q.explanation;
+        const msg = document.getElementById('message');
+
+        if (userInput === correctPos) {
+            const items = document.querySelectorAll('.array-item');
+            items[userInput].classList.add('probed');
+
+            if (arr[userInput] === target) {
+                msg.innerText = `🎉 Correct! You found ${target} at index ${userInput}!`;
+                msg.style.color = "var(--accent)";
+                gameOver = true;
+            } else if (arr[userInput] < target) {
+                low = userInput + 1;
+                msg.innerText = "Correct Calculation! Value too low. Updating 'low' index.";
+                msg.style.color = "var(--primary)";
+            } else {
+                high = userInput - 1;
+                msg.innerText = "Correct Calculation! Value too high. Updating 'high' index.";
+                msg.style.color = "var(--primary)";
+            }
+            updateDisplay();
         } else {
-            feedback.className = 'incorrect';
-            feedback.innerText = "Oops! " + q.explanation;
+            msg.innerText = `❌ Incorrect index. Try the formula again! Hint: Floor of ${correctPos.toFixed(2)}`;
+            msg.style.color = "var(--error)";
         }
-        
-        nextBtn.style.display = 'block';
     }
 
-    nextBtn.onclick = () => {
-        currentQuestion++;
-        if(currentQuestion < quizData.length) {
-            loadQuestion();
-        } else {
-            showResults();
-        }
-    };
-
-    function showResults() {
-        document.getElementById('quiz-content').innerHTML = `
-            <h2>Quiz Complete!</h2>
-            <p style="text-align:center; font-size: 1.5em;">Your Score: ${score} / ${quizData.length}</p>
-            <button onclick="location.reload()" style="width:100%">Restart Quiz</button>
-        `;
-        nextBtn.style.display = 'none';
-        feedback.style.display = 'none';
-    }
-
-    loadQuestion();
+    // Initial Start
+    initGame();
 </script>
 
 </body>
