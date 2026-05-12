@@ -3,41 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interpolation Search: The Game</title>
+    <title>Interpolation Search Game</title>
     <style>
         :root {
-            --primary: #2980b9;
-            --secondary: #8e44ad;
-            --accent: #27ae60;
-            --bg: #f4f7f6;
-            --text: #2c3e50;
+            /* Dark mode color palette */
+            --primary: #3498db;
+            --secondary: #9b59b6;
+            --accent: #2ecc71;
+            --bg: #1a1a2e;
+            --card-bg: #16213e;
+            --text: #e9ecef;
+            --border: #4e4e6a;
+            --input-bg: #0f3460;
+            --error: #e94560;
         }
 
         body {
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
             background-color: var(--bg);
             color: var(--text);
             display: flex;
             justify-content: center;
             padding: 20px;
+            margin: 0;
         }
 
         .game-card {
-            background: white;
+            background: var(--card-bg);
             max-width: 700px;
             width: 100%;
             padding: 30px;
             border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 1px solid var(--border);
         }
 
+        h2 { color: var(--primary); margin-top: 0; }
+
         .formula-box {
-            background: #eef2f3;
+            background: rgba(255, 255, 255, 0.05);
             padding: 15px;
             border-radius: 8px;
             font-size: 0.9em;
             margin-bottom: 20px;
-            border-left: 5px solid var(--primary);
+            border-left: 5px solid var(--secondary);
+            color: #bdc3c7;
         }
 
         .array-container {
@@ -55,34 +65,54 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            border: 2px solid #ddd;
-            border-radius: 5px;
-            background: #fff;
-            transition: 0.3s;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: #1a1a2e;
+            transition: all 0.3s ease;
         }
 
-        .index-label { font-size: 0.7em; color: #7f8c8d; margin-top: -5px; }
-        .value-label { font-weight: bold; }
+        .index-label { font-size: 0.7em; color: #95a5a6; margin-top: -2px; }
+        .value-label { font-weight: bold; color: var(--text); }
 
-        .active-range { border-color: var(--primary); background: #ebf5fb; }
-        .probed { background: var(--secondary); color: white; border-color: var(--secondary); }
+        /* Highlights for the game logic */
+        .active-range { 
+            border-color: var(--primary); 
+            background: rgba(52, 152, 219, 0.2); 
+            box-shadow: 0 0 10px rgba(52, 152, 219, 0.3);
+        }
+        
+        .probed { 
+            background: var(--secondary) !important; 
+            color: white !important; 
+            border-color: var(--secondary) !important;
+            transform: scale(1.1);
+        }
 
         .controls {
             display: flex;
             flex-direction: column;
             gap: 15px;
             margin-top: 20px;
-            background: #f9f9f9;
+            background: rgba(0, 0, 0, 0.2);
             padding: 20px;
             border-radius: 10px;
+            border: 1px solid var(--border);
         }
 
         input {
             padding: 10px;
-            border: 2px solid #ddd;
+            border: 1px solid var(--border);
             border-radius: 5px;
             width: 80px;
             text-align: center;
+            background: var(--input-bg);
+            color: white;
+            font-size: 16px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
         }
 
         button {
@@ -91,14 +121,29 @@
             border-radius: 5px;
             cursor: pointer;
             font-weight: bold;
-            transition: 0.2s;
+            transition: 0.2s ease;
         }
 
         .btn-primary { background: var(--primary); color: white; }
-        .btn-refresh { background: #95a5a6; color: white; margin-top: 10px; }
-        button:hover { opacity: 0.8; }
+        .btn-refresh { 
+            background: transparent; 
+            color: #95a5a6; 
+            border: 1px solid #95a5a6;
+            margin-top: 15px; 
+        }
+        
+        button:hover { filter: brightness(1.2); transform: translateY(-1px); }
+        button:active { transform: translateY(0); }
 
-        #message { margin-top: 15px; font-weight: bold; text-align: center; min-height: 24px; }
+        #message { 
+            margin-top: 15px; 
+            font-weight: bold; 
+            text-align: center; 
+            min-height: 24px; 
+            font-size: 1.1em;
+        }
+
+        hr { border: 0; border-top: 1px solid var(--border); margin: 10px 0; }
     </style>
 </head>
 <body>
