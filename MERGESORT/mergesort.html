@@ -6,237 +6,249 @@
     <title>Merge Sort: Step-by-Step Master</title>
     <style>
         :root {
-            --bg: #0f172a;
-            --card: #1e293b;
-            --accent: #f59e0b; /* Amber for active elements */
-            --node: #334155;
-            --text: #f8fafc;
-            --highlight: #10b981;
+            --bg: #0b0e14;
+            --card: #161b22;
+            --accent: #58a6ff;
+            --success: #238636;
+            --error: #da3633;
+            --text: #c9d1d9;
+            --highlight: #d29922;
         }
 
         body {
-            font-family: 'Courier New', Courier, monospace;
+            font-family: 'Segoe UI', system-ui, sans-serif;
             background-color: var(--bg);
             color: var(--text);
             margin: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
+            min-height: 100vh;
             padding: 20px;
         }
 
-        .status-panel {
+        .header {
             text-align: center;
-            margin-bottom: 20px;
-            padding: 15px;
             background: var(--card);
-            border-radius: 8px;
-            border: 1px solid var(--accent);
-            width: 80%;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #30363d;
+            width: 90%;
+            max-width: 800px;
+            margin-bottom: 30px;
         }
 
-        .tree-container {
+        .level-badge {
+            background: var(--highlight);
+            color: black;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        #game-canvas {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 40px;
+            gap: 20px;
             width: 100%;
         }
 
-        .level-row {
+        .array-row {
             display: flex;
             justify-content: center;
-            gap: 50px;
+            gap: 20px;
             width: 100%;
+            flex-wrap: wrap;
         }
 
-        .array-node {
+        .node {
             display: flex;
-            background: var(--node);
-            padding: 5px;
-            border-radius: 4px;
-            gap: 4px;
-            transition: all 0.3s;
+            background: #21262d;
+            padding: 4px;
+            border-radius: 6px;
             border: 2px solid transparent;
+            transition: all 0.2s;
         }
 
-        .array-node.active {
+        .node.active {
             border-color: var(--accent);
-            box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(88, 166, 255, 0.3);
         }
 
-        .element {
-            width: 35px;
-            height: 35px;
+        .cell {
+            width: 40px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #475569;
-            border-radius: 2px;
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .element.empty {
-            background: #1e293b;
-            border: 1px dashed #64748b;
-            color: transparent;
-        }
-
-        .element.correct { background: var(--highlight); }
-        .element:hover:not(.empty) { background: #64748b; }
-
-        .instruction {
-            color: var(--accent);
+            background: #30363d;
+            margin: 2px;
+            border-radius: 4px;
             font-weight: bold;
-            font-size: 1.2rem;
-            margin: 10px 0;
+            cursor: pointer;
+            transition: 0.2s;
         }
 
-        #reset-btn {
+        .cell.empty { border: 1px dashed #484f58; color: transparent; cursor: default; }
+        .cell.picked { background: var(--success); color: white; }
+        .cell.target { background: #1f242c; border: 1px solid var(--accent); }
+
+        .btn-next {
+            display: none;
             margin-top: 20px;
-            padding: 10px 20px;
-            background: #ef4444;
+            padding: 12px 24px;
+            background: var(--success);
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
+            font-weight: bold;
         }
+
+        #message { margin-top: 15px; font-weight: bold; color: var(--accent); }
     </style>
 </head>
 <body>
 
-    <div class="status-panel">
-        <h1>Merge Sort Simulator</h1>
-        <div id="phase-text" class="instruction">Phase: Dividing</div>
-        <p id="hint">Click the element that represents the middle to split the array.</p>
+    <div class="header">
+        <span class="level-badge" id="level-display">Level 1</span>
+        <h1>Algorithm Quest: Merge Sort</h1>
+        <p id="instruction">Click the smaller number from the child arrays to merge them up!</p>
+        <div id="message"></div>
+        <button id="next-btn" class="btn-next" onclick="nextLevel()">Advance to Next Level</button>
     </div>
 
-    <div class="tree-container" id="game-board">
-        <!-- Rows will be injected here -->
-    </div>
-
-    <button id="reset-btn" onclick="initGame()">Restart Experiment</button>
+    <div id="game-canvas"></div>
 
 <script>
-    // Logic: We'll simulate a 4-element merge sort for clarity
-    let data = [];
-    let step = 0; 
-    // Steps: 
-    // 0: Split [0,1,2,3] -> [0,1] [2,3]
-    // 1: Split [0,1] -> [0], [1]
-    // 2: Split [2,3] -> [2], [3]
-    // 3: Merge [0] & [1] -> [0,1]
-    // 4: Merge [2] & [3] -> [2,3]
-    // 5: Merge [0,1] & [2,3] -> [0,1,2,3]
+    let currentLevel = 1;
+    let arraySize = 4;
+    let mainArray = [];
+    let mergeSteps = [];
+    let currentStepIndex = 0;
 
     function initGame() {
-        data = Array.from({length: 4}, () => Math.floor(Math.random() * 50));
-        step = 0;
+        document.getElementById('next-btn').style.display = 'none';
+        document.getElementById('level-display').innerText = `Level ${currentLevel}`;
+        arraySize = Math.pow(2, currentLevel + 1); // 4, 8, 16...
+        mainArray = Array.from({length: arraySize}, () => Math.floor(Math.random() * 99) + 1);
+        
+        generateMergeSteps();
         renderBoard();
+    }
+
+    // This creates the logic for the "Compare & Merge" steps
+    function generateMergeSteps() {
+        mergeSteps = [];
+        let tempArr = mainArray.map((val, idx) => ({ val, pos: idx, level: 0 }));
+        
+        let workingSize = 1;
+        while (workingSize < arraySize) {
+            for (let i = 0; i < arraySize; i += 2 * workingSize) {
+                let left = mainArray.slice(i, i + workingSize).sort((a,b)=>a-b);
+                let right = mainArray.slice(i + workingSize, i + 2 * workingSize).sort((a,b)=>a-b);
+                let merged = [...left, ...right].sort((a,b)=>a-b);
+                
+                mergeSteps.push({
+                    range: [i, i + 2 * workingSize - 1],
+                    left: left,
+                    right: right,
+                    expected: merged,
+                    userInput: [],
+                    completed: false
+                });
+            }
+            workingSize *= 2;
+        }
+        currentStepIndex = 0;
     }
 
     function renderBoard() {
-        const board = document.getElementById('game-board');
-        board.innerHTML = '';
+        const canvas = document.getElementById('game-canvas');
+        canvas.innerHTML = '';
+        const step = mergeSteps[currentStepIndex];
+
+        // Top Row: The Target (Where we are merging into)
+        const targetRow = document.createElement('div');
+        targetRow.className = 'array-row';
+        const targetNode = document.createElement('div');
+        targetNode.className = 'node active';
         
-        // Phase labels and hints
-        const phaseText = document.getElementById('phase-text');
-        const hint = document.getElementById('hint');
-
-        // Create the rows (Simplified visualization)
-        const rows = {
-            top: createRow('top'),
-            mid: createRow('mid'),
-            bot: createRow('bot')
-        };
-
-        // Logic based on step
-        if (step === 0) {
-            phaseText.innerText = "Phase: Dividing (Lvl 1)";
-            hint.innerText = "The algorithm finds the mid-point. Click a middle element to split.";
-            addArray(rows.top, data, true, (idx) => {
-                if(idx === 1 || idx === 2) nextStep();
-            });
-        } 
-        else if (step === 1) {
-            phaseText.innerText = "Phase: Dividing (Lvl 2)";
-            hint.innerText = "Split the left sub-array into single elements.";
-            addArray(rows.top, data, false);
-            addArray(rows.mid, data.slice(0,2), true, () => nextStep());
-            addArray(rows.mid, data.slice(2,4), false);
+        for(let i=0; i < step.expected.length; i++) {
+            const val = step.userInput[i];
+            targetNode.innerHTML += `<div class="cell ${val === undefined ? 'empty' : 'picked'}">${val || ''}</div>`;
         }
-        else if (step === 2) {
-            phaseText.innerText = "Phase: Dividing (Lvl 2)";
-            hint.innerText = "Now split the right sub-array.";
-            addArray(rows.top, data, false);
-            addArray(rows.mid, data.slice(0,2), false);
-            addArray(rows.mid, data.slice(2,4), true, () => nextStep());
-        }
-        else if (step >= 3) {
-            phaseText.innerText = "Phase: Merging (Conquer)";
-            hint.innerText = "Compare the smallest available elements. Click the SMALLER one to move it up.";
-            
-            // Show the single nodes at the bottom
-            addArray(rows.bot, [data[0]], step === 3);
-            addArray(rows.bot, [data[1]], step === 3);
-            addArray(rows.bot, [data[2]], step === 4);
-            addArray(rows.bot, [data[3]], step === 4);
+        targetRow.appendChild(targetNode);
+        canvas.appendChild(targetRow);
 
-            if (step === 3) {
-                // Merging first two
-                let sortedPair = [data[0], data[1]].sort((a,b)=>a-b);
-                addArray(rows.mid, ["?", "?"], false); 
-                // To keep it simple, clicking either progresses the logic for this demo
-                // In a full game, we'd check if user clicked the smaller of the two bots
-                const bots = rows.bot.querySelectorAll('.element');
-                bots.forEach(el => el.onclick = () => {
-                    const val = parseInt(el.innerText);
-                    const otherVal = parseInt(data[0] === val ? data[1] : data[0]);
-                    if (val <= otherVal) nextStep();
-                    else alert("Wrong! In Merge Sort, we always pick the smaller element first.");
-                });
-            }
-            else if (step === 4) {
-                let leftPair = [data[0], data[1]].sort((a,b)=>a-b);
-                addArray(rows.mid, leftPair, false);
-                addArray(rows.mid, ["?", "?"], false);
-                const bots = rows.bot.querySelectorAll('.element');
-                // Target elements 2 and 3
-                [bots[2], bots[3]].forEach(el => el.onclick = () => nextStep());
-            }
-            else {
-                phaseText.innerText = "CONGRATULATIONS!";
-                hint.innerText = "You have successfully completed the Merge Sort recursion!";
-                addArray(rows.top, data.slice().sort((a,b)=>a-b), false, null, true);
-            }
-        }
+        // Bottom Row: The Source (The two arrays we compare)
+        const sourceRow = document.createElement('div');
+        sourceRow.className = 'array-row';
 
-        Object.values(rows).forEach(r => board.appendChild(r));
-    }
-
-    function createRow(className) {
-        const div = document.createElement('div');
-        div.className = 'level-row ' + className;
-        return div;
-    }
-
-    function addArray(row, items, active, callback, highlight=false) {
-        const node = document.createElement('div');
-        node.className = `array-node ${active ? 'active' : ''}`;
-        items.forEach((item, idx) => {
-            const el = document.createElement('div');
-            el.className = `element ${item === '?' ? 'empty' : ''} ${highlight ? 'correct' : ''}`;
-            el.innerText = item;
-            if(active && callback) el.onclick = () => callback(idx);
-            node.appendChild(el);
+        // Left Sub-array
+        const leftNode = document.createElement('div');
+        leftNode.className = 'node';
+        step.left.forEach((val, idx) => {
+            const isUsed = step.userInput.filter(v => v === val).length > step.left.slice(0,idx).filter(v => v === val).length;
+            leftNode.innerHTML += `<div class="cell" onclick="handlePick(${val}, 'left')">${val}</div>`;
         });
-        row.appendChild(node);
+
+        // Right Sub-array
+        const rightNode = document.createElement('div');
+        rightNode.className = 'node';
+        step.right.forEach((val, idx) => {
+            rightNode.innerHTML += `<div class="cell" onclick="handlePick(${val}, 'right')">${val}</div>`;
+        });
+
+        sourceRow.appendChild(leftNode);
+        sourceRow.appendChild(rightNode);
+        canvas.appendChild(sourceRow);
     }
 
-    function nextStep() {
-        step++;
-        renderBoard();
+    function handlePick(value, side) {
+        const step = mergeSteps[currentStepIndex];
+        const expectedVal = step.expected[step.userInput.length];
+
+        if (value === expectedVal) {
+            step.userInput.push(value);
+            // Remove from source (visual only logic)
+            if(side === 'left') step.left.splice(step.left.indexOf(value), 1);
+            else step.right.splice(step.right.indexOf(value), 1);
+
+            document.getElementById('message').innerText = "Correct! Smaller element moved.";
+            
+            if (step.userInput.length === step.expected.length) {
+                step.completed = true;
+                currentStepIndex++;
+                if (currentStepIndex >= mergeSteps.length) {
+                    victory();
+                } else {
+                    document.getElementById('message').innerText = "Sub-array merged! Moving to next section...";
+                    setTimeout(renderBoard, 1000);
+                }
+            } else {
+                renderBoard();
+            }
+        } else {
+            document.getElementById('message').innerText = "Wait! That's not the smallest element. Compare the fronts of both arrays.";
+            document.getElementById('message').style.color = "var(--error)";
+            setTimeout(() => { document.getElementById('message').style.color = "var(--accent)"; }, 1000);
+        }
+    }
+
+    function victory() {
+        document.getElementById('game-canvas').innerHTML = "<h2>MashaAllah! Array Fully Sorted.</h2>";
+        document.getElementById('instruction').innerText = "Complexity O(n log n) achieved!";
+        document.getElementById('next-btn').style.display = 'block';
+    }
+
+    function nextLevel() {
+        currentLevel++;
+        initGame();
     }
 
     initGame();
