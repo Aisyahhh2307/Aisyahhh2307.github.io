@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Merge Sort: Tree Campaign</title>
+    <title>Merge Sort: Interactive Tree</title>
     <style>
         :root {
             --bg: #0f172a;
@@ -12,7 +12,7 @@
             --node: #334155;
             --text: #f8fafc;
             --highlight: #10b981;
-            --error: #ef4444;
+            --compare: #38bdf8;
         }
 
         body {
@@ -24,284 +24,239 @@
             flex-direction: column;
             align-items: center;
             padding: 20px;
-            min-height: 100vh;
         }
 
         .status-panel {
             text-align: center;
-            margin-bottom: 20px;
-            padding: 15px;
+            margin: 20px;
+            padding: 20px;
             background: var(--card);
-            border-radius: 8px;
-            border: 1px solid var(--accent);
-            width: 90%;
-            max-width: 800px;
+            border-radius: 12px;
+            border: 2px solid var(--accent);
+            width: 80%;
         }
 
-        .tree-container {
+        .board {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 30px;
-            width: 100%;
-            margin-bottom: 100px;
+            gap: 40px;
+            margin-top: 20px;
         }
 
-        .level-row {
+        .row {
             display: flex;
             justify-content: center;
-            gap: 20px;
+            gap: 30px;
             width: 100%;
-            flex-wrap: nowrap;
         }
 
-        .array-node {
+        .node {
             display: flex;
             background: var(--node);
-            padding: 4px;
-            border-radius: 4px;
+            padding: 6px;
+            border-radius: 6px;
             gap: 4px;
-            transition: all 0.3s;
             border: 2px solid transparent;
-            height: fit-content;
         }
 
-        .array-node.active {
-            border-color: var(--accent);
-            box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
-            transform: scale(1.05);
-        }
+        .node.active { border-color: var(--accent); box-shadow: 0 0 15px rgba(245,158,11,0.3); }
 
-        .element {
-            width: 30px;
-            height: 30px;
+        .cell {
+            width: 40px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
             background: #475569;
-            border-radius: 2px;
+            border-radius: 4px;
             cursor: pointer;
-            user-select: none;
-            font-size: 0.9rem;
             font-weight: bold;
+            transition: 0.2s;
         }
 
-        .element.empty {
-            background: #1e293b;
-            border: 1px dashed #64748b;
-            color: transparent;
-        }
+        .cell.empty { background: #1e293b; border: 1px dashed #64748b; color: transparent; cursor: default; }
+        .cell.comparing { background: var(--compare); color: var(--bg); transform: scale(1.1); }
+        .cell.sorted { background: var(--highlight); }
 
-        .element.correct { background: var(--highlight); color: white; }
-        .element.wrong { background: var(--error); }
-
-        .instruction {
-            color: var(--accent);
-            font-weight: bold;
-            font-size: 1.2rem;
-            margin: 5px 0;
-        }
-
-        .stats {
-            font-size: 0.8rem;
-            color: #94a3b8;
-            margin-top: 5px;
-        }
-
-        #next-lvl-btn {
+        .instruction { color: var(--accent); font-size: 1.3rem; margin-bottom: 10px; }
+        
+        #next-btn {
             display: none;
-            margin-top: 20px;
             padding: 15px 30px;
             background: var(--highlight);
-            color: var(--bg);
+            color: white;
             border: none;
-            border-radius: 6px;
-            font-weight: bold;
+            border-radius: 8px;
             cursor: pointer;
+            font-weight: bold;
             font-size: 1.1rem;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
 
     <div class="status-panel">
-        <div id="level-tag" style="font-size: 0.7rem; letter-spacing: 2px; color: var(--accent)">LEVEL 1</div>
-        <h1>Merge Sort Tree</h1>
-        <div id="phase-text" class="instruction">Phase: Dividing</div>
-        <p id="hint">Click the middle to split the array.</p>
-        <div class="stats" id="stats-text">Size: 4 Elements</div>
+        <h2 id="lvl-txt">Level 1: 4 Elements</h2>
+        <div id="phase-txt" class="instruction">Phase: Divide</div>
+        <p id="hint-txt">Click the middle elements of the active array to split it.</p>
     </div>
 
-    <div class="tree-container" id="game-board"></div>
+    <div class="board" id="board"></div>
 
-    <button id="next-lvl-btn" onclick="advanceLevel()">Advance to Next Level</button>
-    <button id="reset-btn" style="background:none; border:none; color:#64748b; cursor:pointer; margin-top:20px;" onclick="initGame()">Restart Level</button>
+    <button id="next-btn" onclick="nextLevel()">Next Level (Complexity Increases)</button>
 
 <script>
-    let currentLevel = 1;
-    let arraySize = 4;
-    let mainData = [];
-    let state = "DIVIDE"; // DIVIDE or MERGE
-    let divideStep = 0;   // How many splits performed
-    let mergeStep = 0;    // How many merges performed
-    
-    // We'll use these to track the "active" nodes the user needs to click
-    let nodes = [];
+    let level = 1;
+    let size = 4;
+    let data = [];
+    let state = "DIVIDE"; // DIVIDE -> MERGE
+    let splitCount = 0;
+    let mergeResults = []; // To track the user's manual merge progress
 
-    function initGame() {
-        arraySize = Math.pow(2, currentLevel + 1);
-        mainData = Array.from({length: arraySize}, () => Math.floor(Math.random() * 90) + 1);
-        divideStep = 0;
-        mergeStep = 0;
+    function init() {
+        size = Math.pow(2, level + 1);
+        data = Array.from({length: size}, () => Math.floor(Math.random() * 99) + 1);
+        splitCount = 0;
         state = "DIVIDE";
-        document.getElementById('next-lvl-btn').style.display = 'none';
-        document.getElementById('level-tag').innerText = `LEVEL ${currentLevel}`;
-        document.getElementById('stats-text').innerText = `Size: ${arraySize} Elements`;
+        mergeResults = [];
+        document.getElementById('next-btn').style.display = 'none';
+        document.getElementById('lvl-txt').innerText = `Level ${level}: ${size} Elements`;
         render();
     }
 
     function render() {
-        const board = document.getElementById('game-board');
+        const board = document.getElementById('board');
         board.innerHTML = '';
-        
-        const phaseText = document.getElementById('phase-text');
-        const hint = document.getElementById('hint');
+        const phaseTxt = document.getElementById('phase-txt');
+        const hintTxt = document.getElementById('hint-txt');
 
         if (state === "DIVIDE") {
-            phaseText.innerText = "Phase: Dividing (Split)";
-            hint.innerText = "Find the midpoint and click it to split the arrays down.";
-            renderDivideTree(board);
+            phaseTxt.innerText = "Phase: Divide (Splitting)";
+            hintTxt.innerText = "Target the center to split arrays into sub-problems.";
+            renderDivide(board);
         } else {
-            phaseText.innerText = "Phase: Merging (Conquer)";
-            hint.innerText = "Click the smaller value between the two active child arrays.";
-            renderMergeTree(board);
+            phaseTxt.innerText = "Phase: Merge (Conquering)";
+            hintTxt.innerText = "Click the SMALLER number to merge it into the sorted array above.";
+            renderMerge(board);
         }
     }
 
-    function renderDivideTree(container) {
-        // We calculate how many rows we need based on log2(size)
-        let depth = Math.log2(arraySize);
-        
-        for (let d = 0; d <= depth; d++) {
-            const row = document.createElement('div');
-            row.className = 'level-row';
-            let numArraysInRow = Math.pow(2, d);
-            let elementsPerArray = arraySize / numArraysInRow;
+    function renderDivide(container) {
+        // Simple 2-level representation for the Divide phase
+        const topRow = createRow();
+        const bottomRow = createRow();
 
-            // Only show rows up to the current divide step
-            if (d > Math.floor(divideStep / (numArraysInRow/2)) + 1 && d > 0) continue;
-
-            for (let i = 0; i < numArraysInRow; i++) {
-                let start = i * elementsPerArray;
-                let arr = mainData.slice(start, start + elementsPerArray);
-                
-                // Logic to determine if this node is "clickable"
-                let isActive = false;
-                if (state === "DIVIDE") {
-                    let currentDepthWorking = Math.floor(Math.log2(Math.max(1, divideStep + 1)));
-                    // Simplified: Is this the current node being split?
-                    if (d === divideStep && elementsPerArray > 1) isActive = true;
-                    // For Level 1 & 2, let's keep it simple:
-                    if (elementsPerArray > 1 && d === getDivideDepth()) isActive = true;
-                }
-
-                addArray(row, arr, isActive, (idx) => {
-                    if (idx === Math.floor(arr.length / 2) || idx === Math.floor(arr.length / 2) - 1) {
-                        divideStep++;
-                        if (Math.pow(2, depth) === Math.pow(2, d + 1)) {
-                            // Check if all splits at this level done
-                            if (divideStep >= arraySize - 1) state = "MERGE";
-                        }
-                        render();
-                    }
-                });
-            }
-            container.appendChild(row);
+        // Top Node
+        const topNode = createNode(data, splitCount === 0);
+        if (splitCount === 0) {
+            topNode.onclick = () => { splitCount = 1; render(); };
         }
-    }
+        topRow.appendChild(topNode);
 
-    function getDivideDepth() {
-        if (divideStep < 1) return 0;
-        if (divideStep < 3) return 1;
-        if (divideStep < 7) return 2;
-        return 3;
-    }
+        // Sub Nodes
+        if (splitCount >= 1) {
+            const left = data.slice(0, size/2);
+            const right = data.slice(size/2);
+            
+            const leftNode = createNode(left, splitCount === 1);
+            const rightNode = createNode(right, splitCount === 2);
 
-    function renderMergeTree(container) {
-        let depth = Math.log2(arraySize);
-        // During merge, we show the full tree, but the top layers are "empty" boxes
-        // until the user fills them.
-        
-        for (let d = 0; d <= depth; d++) {
-            const row = document.createElement('div');
-            row.className = 'level-row';
-            let numArraysInRow = Math.pow(2, d);
-            let elementsPerArray = arraySize / numArraysInRow;
+            if (splitCount === 1) leftNode.onclick = () => { splitCount = 2; render(); };
+            if (splitCount === 2) rightNode.onclick = () => { 
+                state = "MERGE"; 
+                // Initialize empty merge result slots
+                mergeResults = Array(size).fill(null);
+                render(); 
+            };
 
-            for (let i = 0; i < numArraysInRow; i++) {
-                let start = i * elementsPerArray;
-                let sortedPart = mainData.slice(start, start + elementsPerArray).sort((a,b)=>a-b);
-                
-                // Determine what to show in the box
-                // Bottom row is always visible
-                let displayArr = [];
-                let isTarget = false;
-
-                if (d === depth) {
-                    displayArr = [mainData[i]];
-                } else {
-                    // Logic to show "?" for unmerged parts
-                    // This is a simplified simulation of the merge progress
-                    if (currentLevel === 1 && d === 1 && mergeStep < 2) displayArr = ["?", "?"];
-                    else if (d === 0 && mergeStep < arraySize - 1) displayArr = Array(arraySize).fill("?");
-                    else displayArr = sortedPart;
-                }
-
-                // If this is the row currently being merged into
-                if (d === depth - 1) isTarget = true;
-
-                addArray(row, displayArr, d === depth, (val) => {
-                    // Simple logic: if user clicks a bottom element, we progress
-                    // In a real one, we'd check if it's the smaller of the pair
-                    mergeStep++;
-                    if (mergeStep >= (arraySize * 2)) {
-                        victory();
-                    }
-                    render();
-                });
-            }
-            container.insertAdjacentElement('afterbegin', row);
+            bottomRow.appendChild(leftNode);
+            bottomRow.appendChild(rightNode);
         }
-        
-        if (mergeStep > arraySize) victory();
+
+        container.appendChild(topRow);
+        container.appendChild(bottomRow);
     }
 
-    function addArray(row, items, active, callback) {
-        const node = document.createElement('div');
-        node.className = `array-node ${active ? 'active' : ''}`;
-        items.forEach((item, idx) => {
-            const el = document.createElement('div');
-            el.className = `element ${item === '?' ? 'empty' : ''}`;
-            el.innerText = item;
-            if (active && callback) el.onclick = () => callback(item, idx);
-            node.appendChild(el);
+    function renderMerge(container) {
+        const topRow = createRow();
+        const botRow = createRow();
+
+        // The Result Array (Empty slots to fill)
+        const resNode = document.createElement('div');
+        resNode.className = "node active";
+        mergeResults.forEach(val => {
+            const c = document.createElement('div');
+            c.className = `cell ${val === null ? 'empty' : 'sorted'}`;
+            c.innerText = val || '';
+            resNode.appendChild(c);
         });
-        row.appendChild(node);
+        topRow.appendChild(resNode);
+
+        // The source arrays (Split)
+        const leftArr = data.slice(0, size/2).sort((a,b)=>a-b);
+        const rightArr = data.slice(size/2).sort((a,b)=>a-b);
+
+        const leftNode = createNode(leftArr);
+        const rightNode = createNode(rightArr);
+
+        // Highlight the current fronts for comparison
+        // (Simplified logic: always looks at first element of sorted sub-arrays)
+        // Note: In a real recursive game, we'd remove elements as we pick them
+        const pick = (val, node) => {
+            const sortedFinal = [...data].sort((a,b)=>a-b);
+            const nextExpected = sortedFinal[mergeResults.filter(x => x !== null).length];
+
+            if (val === nextExpected) {
+                const idx = mergeResults.indexOf(null);
+                mergeResults[idx] = val;
+                if (mergeResults.every(x => x !== null)) {
+                    document.getElementById('next-btn').style.display = 'block';
+                }
+                render();
+            } else {
+                alert("Wrong! Compare the fronts. Pick the smallest!");
+            }
+        };
+
+        leftNode.querySelectorAll('.cell').forEach(c => {
+            c.onclick = () => pick(parseInt(c.innerText), leftNode);
+        });
+        rightNode.querySelectorAll('.cell').forEach(c => {
+            c.onclick = () => pick(parseInt(c.innerText), rightNode);
+        });
+
+        botRow.appendChild(leftNode);
+        botRow.appendChild(rightNode);
+        container.appendChild(topRow);
+        container.appendChild(botRow);
     }
 
-    function victory() {
-        document.getElementById('phase-text').innerText = "Level Complete!";
-        document.getElementById('phase-text').style.color = "var(--highlight)";
-        document.getElementById('hint').innerText = "You have mastered this complexity.";
-        document.getElementById('next-lvl-btn').style.display = 'block';
+    function createRow() {
+        const r = document.createElement('div');
+        r.className = 'row';
+        return r;
     }
 
-    function advanceLevel() {
-        currentLevel++;
-        initGame();
+    function createNode(arr, isActive = false) {
+        const n = document.createElement('div');
+        n.className = `node ${isActive ? 'active' : ''}`;
+        arr.forEach(v => {
+            const c = document.createElement('div');
+            c.className = 'cell';
+            c.innerText = v;
+            n.appendChild(c);
+        });
+        return n;
     }
 
-    initGame();
+    function nextLevel() {
+        level++;
+        init();
+    }
+
+    init();
 </script>
 </body>
 </html>
