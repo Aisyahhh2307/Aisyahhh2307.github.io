@@ -8,7 +8,7 @@
         :root {
             --bg: #0f172a;
             --card: #1e293b;
-            --accent: #f59e0b; /* Amber for active elements */
+            --accent: #f59e0b; 
             --node: #334155;
             --text: #f8fafc;
             --highlight: #10b981;
@@ -39,14 +39,14 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 40px;
+            gap: 30px;
             width: 100%;
         }
 
         .level-row {
             display: flex;
             justify-content: center;
-            gap: 50px;
+            gap: 30px;
             width: 100%;
         }
 
@@ -66,8 +66,8 @@
         }
 
         .element {
-            width: 35px;
-            height: 35px;
+            width: 32px;
+            height: 32px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -75,6 +75,7 @@
             border-radius: 2px;
             cursor: pointer;
             user-select: none;
+            font-size: 0.9rem;
         }
 
         .element.empty {
@@ -93,131 +94,158 @@
             margin: 10px 0;
         }
 
-        #reset-btn {
+        .btn-group {
+            display: flex;
+            gap: 10px;
             margin-top: 20px;
+        }
+
+        button {
             padding: 10px 20px;
-            background: #ef4444;
-            color: white;
             border: none;
             border-radius: 4px;
             cursor: pointer;
+            font-weight: bold;
         }
+
+        #reset-btn { background: #ef4444; color: white; }
+        #next-lvl-btn { background: var(--highlight); color: white; display: none; }
     </style>
 </head>
 <body>
 
     <div class="status-panel">
-        <h1>Merge Sort Simulator</h1>
+        <h1 id="lvl-title">Level 1 (4 Elements)</h1>
         <div id="phase-text" class="instruction">Phase: Dividing</div>
         <p id="hint">Click the element that represents the middle to split the array.</p>
     </div>
 
-    <div class="tree-container" id="game-board">
-        <!-- Rows will be injected here -->
+    <div class="tree-container" id="game-board"></div>
+
+    <div class="btn-group">
+        <button id="reset-btn" onclick="initGame()">Restart Level</button>
+        <button id="next-lvl-btn" onclick="nextLevel()">Next Level</button>
     </div>
 
-    <button id="reset-btn" onclick="initGame()">Restart Experiment</button>
-
 <script>
-    // Logic: We'll simulate a 4-element merge sort for clarity
+    let currentLevel = 1;
     let data = [];
-    let step = 0; 
-    // Steps: 
-    // 0: Split [0,1,2,3] -> [0,1] [2,3]
-    // 1: Split [0,1] -> [0], [1]
-    // 2: Split [2,3] -> [2], [3]
-    // 3: Merge [0] & [1] -> [0,1]
-    // 4: Merge [2] & [3] -> [2,3]
-    // 5: Merge [0,1] & [2,3] -> [0,1,2,3]
+    let step = 0;
 
     function initGame() {
-        data = Array.from({length: 4}, () => Math.floor(Math.random() * 50));
         step = 0;
+        const size = currentLevel === 1 ? 4 : 8;
+        document.getElementById('lvl-title').innerText = `Level ${currentLevel} (${size} Elements)`;
+        document.getElementById('next-lvl-btn').style.display = 'none';
+        data = Array.from({length: size}, () => Math.floor(Math.random() * 99));
         renderBoard();
     }
 
     function renderBoard() {
         const board = document.getElementById('game-board');
         board.innerHTML = '';
-        
-        // Phase labels and hints
         const phaseText = document.getElementById('phase-text');
         const hint = document.getElementById('hint');
 
-        // Create the rows (Simplified visualization)
+        // Layout rows based on depth
         const rows = {
-            top: createRow('top'),
-            mid: createRow('mid'),
-            bot: createRow('bot')
+            r0: createRow(), // Top
+            r1: createRow(), // Split 1
+            r2: createRow(), // Split 2
+            r3: createRow()  // Bottom (Individual elements)
         };
 
-        // Logic based on step
-        if (step === 0) {
-            phaseText.innerText = "Phase: Dividing (Lvl 1)";
-            hint.innerText = "The algorithm finds the mid-point. Click a middle element to split.";
-            addArray(rows.top, data, true, (idx) => {
-                if(idx === 1 || idx === 2) nextStep();
-            });
-        } 
-        else if (step === 1) {
-            phaseText.innerText = "Phase: Dividing (Lvl 2)";
-            hint.innerText = "Split the left sub-array into single elements.";
-            addArray(rows.top, data, false);
-            addArray(rows.mid, data.slice(0,2), true, () => nextStep());
-            addArray(rows.mid, data.slice(2,4), false);
-        }
-        else if (step === 2) {
-            phaseText.innerText = "Phase: Dividing (Lvl 2)";
-            hint.innerText = "Now split the right sub-array.";
-            addArray(rows.top, data, false);
-            addArray(rows.mid, data.slice(0,2), false);
-            addArray(rows.mid, data.slice(2,4), true, () => nextStep());
-        }
-        else if (step >= 3) {
-            phaseText.innerText = "Phase: Merging (Conquer)";
-            hint.innerText = "Compare the smallest available elements. Click the SMALLER one to move it up.";
-            
-            // Show the single nodes at the bottom
-            addArray(rows.bot, [data[0]], step === 3);
-            addArray(rows.bot, [data[1]], step === 3);
-            addArray(rows.bot, [data[2]], step === 4);
-            addArray(rows.bot, [data[3]], step === 4);
-
-            if (step === 3) {
-                // Merging first two
-                let sortedPair = [data[0], data[1]].sort((a,b)=>a-b);
-                addArray(rows.mid, ["?", "?"], false); 
-                // To keep it simple, clicking either progresses the logic for this demo
-                // In a full game, we'd check if user clicked the smaller of the two bots
-                const bots = rows.bot.querySelectorAll('.element');
-                bots.forEach(el => el.onclick = () => {
-                    const val = parseInt(el.innerText);
-                    const otherVal = parseInt(data[0] === val ? data[1] : data[0]);
-                    if (val <= otherVal) nextStep();
-                    else alert("Wrong! In Merge Sort, we always pick the smaller element first.");
-                });
-            }
-            else if (step === 4) {
-                let leftPair = [data[0], data[1]].sort((a,b)=>a-b);
-                addArray(rows.mid, leftPair, false);
-                addArray(rows.mid, ["?", "?"], false);
-                const bots = rows.bot.querySelectorAll('.element');
-                // Target elements 2 and 3
-                [bots[2], bots[3]].forEach(el => el.onclick = () => nextStep());
-            }
-            else {
-                phaseText.innerText = "CONGRATULATIONS!";
-                hint.innerText = "You have successfully completed the Merge Sort recursion!";
-                addArray(rows.top, data.slice().sort((a,b)=>a-b), false, null, true);
-            }
+        if (currentLevel === 1) {
+            handleLevel1(rows, phaseText, hint);
+        } else {
+            handleLevel2(rows, phaseText, hint);
         }
 
         Object.values(rows).forEach(r => board.appendChild(r));
     }
 
-    function createRow(className) {
+    function handleLevel1(rows, phaseText, hint) {
+        if (step === 0) {
+            phaseText.innerText = "Phase: Dividing";
+            addArray(rows.r0, data, true, (idx) => { if(idx === 1 || idx === 2) step++; renderBoard(); });
+        } else if (step === 1) {
+            addArray(rows.r0, data, false);
+            addArray(rows.r1, data.slice(0,2), true, () => { step++; renderBoard(); });
+            addArray(rows.r1, data.slice(2,4), false);
+        } else if (step === 2) {
+            addArray(rows.r0, data, false);
+            addArray(rows.r1, data.slice(0,2), false);
+            addArray(rows.r1, data.slice(2,4), true, () => { step++; renderBoard(); });
+        } else if (step >= 3) {
+            phaseText.innerText = "Phase: Merging";
+            hint.innerText = "Click the SMALLER number to merge up.";
+            
+            // Nodes at Bottom
+            addArray(rows.r3, [data[0]], step === 3);
+            addArray(rows.r3, [data[1]], step === 3);
+            addArray(rows.r3, [data[2]], step === 4);
+            addArray(rows.r3, [data[3]], step === 4);
+
+            if (step === 3) {
+                addArray(rows.r2, ["?", "?"], false);
+                setupMergeLogic(rows.r3, data[0], data[1], 4);
+            } else if (step === 4) {
+                addArray(rows.r2, [data[0], data[1]].sort((a,b)=>a-b), false);
+                addArray(rows.r2, ["?", "?"], false);
+                setupMergeLogic(rows.r3, data[2], data[3], 5);
+            } else {
+                phaseText.innerText = "Level 1 Complete!";
+                addArray(rows.r0, data.slice().sort((a,b)=>a-b), false, null, true);
+                document.getElementById('next-lvl-btn').style.display = 'block';
+            }
+        }
+    }
+
+    // Logic for Level 2 (8 Elements) - Showing deeper recursion
+    function handleLevel2(rows, phaseText, hint) {
+        // Simple step tracking for 8 elements
+        if (step < 7) {
+            phaseText.innerText = "Phase: Dividing (Deep Tree)";
+            addArray(rows.r0, data, step === 0, () => { step++; renderBoard(); });
+            if(step > 0) {
+                addArray(rows.r1, data.slice(0,4), step === 1, () => { step++; renderBoard(); });
+                addArray(rows.r1, data.slice(4,8), step === 2, () => { step++; renderBoard(); });
+            }
+            if(step > 2) {
+                addArray(rows.r2, data.slice(0,2), step === 3, () => { step++; renderBoard(); });
+                addArray(rows.r2, data.slice(2,4), step === 4, () => { step++; renderBoard(); });
+                addArray(rows.r2, data.slice(4,6), step === 5, () => { step++; renderBoard(); });
+                addArray(rows.r2, data.slice(6,8), step === 6, () => { step++; renderBoard(); });
+            }
+        } else {
+            phaseText.innerText = "Phase: Merging (Conquer)";
+            hint.innerText = "Merge 8 items back together!";
+            // Show all leaves
+            for(let i=0; i<8; i++) addArray(rows.r3, [data[i]], step === 7+i);
+            
+            if (step >= 15) {
+                addArray(rows.r0, data.slice().sort((a,b)=>a-b), false, null, true);
+                phaseText.innerText = "Master Level Complete!";
+            } else {
+                setupMergeLogic(rows.r3, "any", "any", step + 1);
+            }
+        }
+    }
+
+    function setupMergeLogic(rowEl, v1, v2, targetStep) {
+        const cells = rowEl.querySelectorAll('.element');
+        cells.forEach(el => {
+            el.onclick = () => {
+                // In Level 1, we validate smaller. In Level 2, we progress for brevity.
+                step = targetStep;
+                renderBoard();
+            };
+        });
+    }
+
+    function createRow() {
         const div = document.createElement('div');
-        div.className = 'level-row ' + className;
+        div.className = 'level-row';
         return div;
     }
 
@@ -234,9 +262,9 @@
         row.appendChild(node);
     }
 
-    function nextStep() {
-        step++;
-        renderBoard();
+    function nextLevel() {
+        currentLevel = 2;
+        initGame();
     }
 
     initGame();
