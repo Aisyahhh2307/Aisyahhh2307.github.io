@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interpolation Search Interactive Quiz</title>
+    <style>
+        :root {
+            --primary: #4a90e2;
+            --secondary: #f39c12;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+            --success: #27ae60;
+            --error: #e74c3c;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        h1, h2 { color: var(--primary); text-align: center; }
+
+        .formula {
+            background: #f8f9fa;
+            padding: 15px;
+            border-left: 5px solid var(--primary);
+            font-family: 'Courier New', Courier, monospace;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .quiz-section {
+            border-top: 2px solid var(--light);
+            margin-top: 30px;
+            padding-top: 20px;
+        }
+
+        .question {
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .options {
+            display: grid;
+            gap: 10px;
+        }
+
+        button {
+            padding: 12px;
+            border: 2px solid var(--primary);
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        #feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 6px;
+            display: none;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .correct { background-color: #d4edda; color: var(--success); }
+        .incorrect { background-color: #f8d7da; color: var(--error); }
+
+        .progress {
+            text-align: right;
+            font-size: 0.9em;
+            color: #7f8c8d;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🔍 Interpolation Search Master</h1>
+    
+    <p>Interpolation Search is an algorithm for searching for a key in an <b>sorted</b> array of uniformly distributed values.</p>
+    
+    <div class="formula">
+        pos = low + [ ((high - low) / (arr[high] - arr[low])) * (x - arr[low]) ]
+    </div>
+
+    <div class="quiz-section" id="quiz-container">
+        <div class="progress">Question <span id="q-number">1</span> of 3</div>
+        <div id="quiz-content">
+            <p class="question" id="question-text"></p>
+            <div class="options" id="options-container"></div>
+        </div>
+        <div id="feedback"></div>
+        <button id="next-btn" style="display:none; margin-top:20px; width:100%; background: var(--dark); color:white;">Next Question</button>
+    </div>
+</div>
+
+<script>
+    const quizData = [
+        {
+            question: "What is the primary requirement for Interpolation Search to work efficiently?",
+            options: ["The array must be unsorted", "Values must be uniformly distributed and sorted", "The array must contain only strings", "The array must be very small"],
+            answer: 1,
+            explanation: "Interpolation search relies on the values being sorted and ideally uniformly distributed to accurately estimate the position."
+        },
+        {
+            question: "What is the average time complexity of Interpolation Search?",
+            options: ["O(n)", "O(log n)", "O(log(log n))", "O(n^2)"],
+            answer: 2,
+            explanation: "For uniformly distributed data, Interpolation Search is incredibly fast, averaging O(log(log n))."
+        },
+        {
+            question: "If we search for 70 in [10, 20, 30, 40, 50, 60, 70, 80], where will the algorithm likely look first?",
+            options: ["At the beginning (Index 0)", "Right at the middle (Index 3/4)", "Near the end (Index 6)", "It picks a random index"],
+            answer: 2,
+            explanation: "Because 70 is closer to the maximum value (80) than the minimum (10), the formula probes near the end of the array."
+        }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+
+    const questionText = document.getElementById('question-text');
+    const optionsContainer = document.getElementById('options-container');
+    const feedback = document.getElementById('feedback');
+    const nextBtn = document.getElementById('next-btn');
+    const qNumber = document.getElementById('q-number');
+
+    function loadQuestion() {
+        const q = quizData[currentQuestion];
+        questionText.innerText = q.question;
+        qNumber.innerText = currentQuestion + 1;
+        optionsContainer.innerHTML = '';
+        feedback.style.display = 'none';
+        nextBtn.style.display = 'none';
+
+        q.options.forEach((opt, index) => {
+            const btn = document.createElement('button');
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(index);
+            optionsContainer.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(choice) {
+        const q = quizData[currentQuestion];
+        feedback.style.display = 'block';
+        
+        // Disable all buttons
+        const buttons = optionsContainer.querySelectorAll('button');
+        buttons.forEach(b => b.disabled = true);
+
+        if(choice === q.answer) {
+            score++;
+            feedback.className = 'correct';
+            feedback.innerText = "Correct! " + q.explanation;
+        } else {
+            feedback.className = 'incorrect';
+            feedback.innerText = "Oops! " + q.explanation;
+        }
+        
+        nextBtn.style.display = 'block';
+    }
+
+    nextBtn.onclick = () => {
+        currentQuestion++;
+        if(currentQuestion < quizData.length) {
+            loadQuestion();
+        } else {
+            showResults();
+        }
+    };
+
+    function showResults() {
+        document.getElementById('quiz-content').innerHTML = `
+            <h2>Quiz Complete!</h2>
+            <p style="text-align:center; font-size: 1.5em;">Your Score: ${score} / ${quizData.length}</p>
+            <button onclick="location.reload()" style="width:100%">Restart Quiz</button>
+        `;
+        nextBtn.style.display = 'none';
+        feedback.style.display = 'none';
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+</html>
